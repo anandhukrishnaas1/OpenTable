@@ -1,50 +1,90 @@
 import { initializeApp } from "firebase/app";
-import { getDatabase, ref, push, set, serverTimestamp } from "firebase/database";
-import { getAuth, GoogleAuthProvider, signInWithPopup, signOut } from "firebase/auth";
+import { 
+  getAuth, 
+  GoogleAuthProvider, 
+  signInWithPopup, 
+  signOut, 
+  onAuthStateChanged,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  updateProfile,
+  User 
+} from "firebase/auth";
+import { getFirestore, doc, setDoc } from "firebase/firestore";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyCYDCrY3LB-MKx90WTVeQ1vGHqfzGuc08g",
-  authDomain: "freshlink1-88357.firebaseapp.com",
+apiKey: import.meta.env.VITE_FIREBASE_API_KEY,  authDomain: "freshlink1-88357.firebaseapp.com",
   projectId: "freshlink1-88357",
   storageBucket: "freshlink1-88357.firebasestorage.app",
   messagingSenderId: "987793950140",
   appId: "1:987793950140:web:d5369e884e5c25c55817b9",
   measurementId: "G-FB5EG3W782"
 };
+
 const app = initializeApp(firebaseConfig);
-
-// Initialize Services
-export const db = getDatabase(app);
 export const auth = getAuth(app);
-export const googleProvider = new GoogleAuthProvider();
+export const db = getFirestore(app);
+const googleProvider = new GoogleAuthProvider();
 
-// Auth Helpers
 export const signInWithGoogle = async () => {
   try {
-    await signInWithPopup(auth, googleProvider);
+    const result = await signInWithPopup(auth, googleProvider);
+    return result.user;
   } catch (error) {
-    console.error("Error signing in", error);
+    console.error("Google Sign In Error:", error);
+    throw error;
+  }
+};
+
+export const registerWithEmail = async (email: string, pass: string, name: string, phone: string) => {
+  try {
+    const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
+    const user = userCredential.user;
+    
+    // Update the user's display name
+    await updateProfile(user, { displayName: name });
+    
+    // Store extra details (phone) in Firestore since Auth doesn't store phone by default for email users
+    await setDoc(doc(db, "users", user.uid), {
+      uid: user.uid,
+      name: name,
+      email: email,
+      phone: phone,
+      role: 'user', // Default role
+      createdAt: new Date()
+    });
+
+    return user;
+  } catch (error) {
+    console.error("Registration Error:", error);
+    throw error;
+  }
+};
+
+export const loginWithEmail = async (email: string, pass: string) => {
+  try {
+    const result = await signInWithEmailAndPassword(auth, email, pass);
+    return result.user;
+  } catch (error) {
+    console.error("Login Error:", error);
+    throw error;
   }
 };
 
 export const logout = () => signOut(auth);
 
-// Database Helper
+// Helper for donation saving
 export const saveDonationToCloud = async (data: any) => {
   try {
-    const donationsRef = ref(db, 'donations');
-    const newDonationRef = push(donationsRef);
-    
-    await set(newDonationRef, {
+    const donationRef = doc(db, "donations", data.id || Math.random().toString(36));
+    await setDoc(donationRef, {
       ...data,
-      createdAt: serverTimestamp(),
-      status: "available"
+      uploadedAt: new Date()
     });
-    
-    return newDonationRef.key;
+    console.log("Document written with ID: ", donationRef.id);
   } catch (e) {
-    console.error("Error saving data: ", e);
+    console.error("Error adding document: ", e);
     throw e;
   }
 };

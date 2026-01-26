@@ -1,147 +1,104 @@
-import React, { useEffect, useState } from 'react';
-import { ref, onValue, update } from "firebase/database";
-import { db } from "../services/firebase";
-import { Link } from 'react-router-dom';
-import { ArrowLeft, Clock, Package, MapPin, ExternalLink } from 'lucide-react';
-
-interface Donation {
-  id: string;
-  item: string;
-  category: string;
-  expiresIn: string;
-  imageUrl: string;
-  status: 'available' | 'reserved' | 'picked_up';
-  timestamp: number;
-  location?: { lat: number, lng: number };
-}
+import React from 'react';
+import { Layout } from '../components/Layout';
+import { MapPin, Phone, CheckCircle, Clock, ExternalLink } from 'lucide-react';
+import { useDonations } from '../contexts/DonationContext'; // <--- IMPORT CONTEXT
 
 const VolunteerDashboard: React.FC = () => {
-  const [donations, setDonations] = useState<Donation[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { donations, claimDonation } = useDonations();
 
-  useEffect(() => {
-    const donationsRef = ref(db, 'donations');
+  // Filter only 'active' donations for the volunteer to see
+  const availablePickups = donations.filter(d => d.status === 'active');
 
-    const unsubscribe = onValue(donationsRef, (snapshot) => {
-      const data = snapshot.val();
-      if (data) {
-        const donationList = Object.entries(data).map(([key, value]: [string, any]) => ({
-          id: key,
-          ...value,
-        }));
-        setDonations(donationList.reverse());
-      } else {
-        setDonations([]);
-      }
-      setLoading(false);
-    });
-
-    return () => unsubscribe();
-  }, []);
-
-  const handleClaim = async (id: string) => {
-    try {
-      const donationRef = ref(db, `donations/${id}`);
-      await update(donationRef, {
-        status: 'reserved',
-        pickedUpBy: 'Volunteer 1',
-        pickedUpAt: Date.now()
-      });
-    } catch (e) {
-      console.error("Error claiming item:", e);
-      alert("Failed to claim item. It might have been taken.");
+  // Helper to open Google Maps
+  const openMaps = (address: string) => {
+    // If it looks like coordinates (Lat: ..., Long: ...)
+    if (address.includes('Lat:') && address.includes('Long:')) {
+       // Extract numbers roughly for the query
+       const query = address.replace('Lat:', '').replace('Long:', '').replace(/\s/g, '');
+       window.open(`https://www.google.com/maps/search/?api=1&query=${query}`, '_blank');
+    } else {
+       // Standard address search
+       window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`, '_blank');
     }
   };
 
-  const openMaps = (lat: number, lng: number) => {
-    // FIX: Use https and standard query format
-    window.open(`https://www.google.com/maps/search/?api=1&query=${lat},${lng}`, '_blank');
-  };
-
   return (
-    <div className="flex flex-col h-[calc(100vh-80px)]">
-      <header className="bg-white border-b px-4 py-3 flex items-center gap-3 sticky top-0 z-10">
-        <Link to="/" className="p-2 hover:bg-gray-100 rounded-full text-gray-600">
-          <ArrowLeft size={20} />
-        </Link>
-        <div>
-          <h2 className="font-bold text-gray-800 flex items-center gap-2">
-            Volunteer Feed <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full animate-pulse">LIVE</span>
-          </h2>
-          <p className="text-xs text-gray-500">Real-time donation alerts</p>
+    <Layout>
+      <div className="max-w-4xl mx-auto px-6 py-10">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900">Volunteer Dashboard</h1>
+          <p className="text-gray-500">Find donations near you that need pickup.</p>
         </div>
-      </header>
 
-      <div className="flex-1 overflow-y-auto bg-gray-50 p-4">
-        {loading ? (
-          <div className="text-center py-10 text-gray-400">Loading donations...</div>
-        ) : donations.length === 0 ? (
-          <div className="text-center py-20">
-            <div className="bg-gray-200 p-6 rounded-full inline-block mb-4 text-gray-400">
-              <Package size={48} />
-            </div>
-            <p className="text-gray-500">No active donations right now.</p>
-          </div>
-        ) : (
-          <div className="space-y-4">
-            {donations.map((donation) => (
-              <div key={donation.id} className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex gap-4 animate-in slide-in-from-bottom-2">
-                <div className="relative w-20 h-20 shrink-0">
-                   <img 
-                    src={donation.imageUrl} 
-                    alt={donation.item} 
-                    className="w-full h-full object-cover rounded-xl"
-                  />
-                  <div className="absolute -bottom-2 -right-2 bg-emerald-500 text-white text-[10px] font-bold px-2 py-1 rounded-full shadow-sm">
-                    {donation.category}
+        <div className="grid gap-6">
+          {availablePickups.map((pickup) => (
+            <div key={pickup.id} className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+              <div className="flex justify-between items-start gap-4">
+                <div className="flex gap-4">
+                  {pickup.imageUrl && (
+                    <img src={pickup.imageUrl} alt={pickup.item} className="w-24 h-24 rounded-xl object-cover bg-gray-100" />
+                  )}
+                  <div>
+                    <h3 className="text-xl font-bold text-gray-900">{pickup.item}</h3>
+                    <p className="text-green-600 font-medium">{pickup.quantity}</p>
+                    <span className="inline-block mt-2 bg-gray-100 text-gray-600 text-xs font-bold px-2 py-1 rounded">
+                      {pickup.donorType}
+                    </span>
                   </div>
                 </div>
-                
-                <div className="flex-1 min-w-0 flex flex-col justify-between">
-                  <div>
-                    <h3 className="font-bold text-gray-900 truncate">{donation.item}</h3>
-                    <div className="flex items-center gap-2 mt-1 flex-wrap">
-                      <div className="flex items-center gap-1 text-xs text-gray-500">
-                        <Clock size={12} />
-                        <span>{donation.expiresIn}</span>
-                      </div>
-                      
-                      {/* ROBUST LOCATION CHECK */}
-                      {donation.location && typeof donation.location.lat === 'number' ? (
-                        <button 
-                          onClick={() => openMaps(donation.location!.lat, donation.location!.lng)}
-                          className="flex items-center gap-1 text-[10px] bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full hover:bg-blue-100 transition-colors"
-                        >
-                          <MapPin size={10} />
-                          <span>{donation.location.lat.toFixed(4).slice(0, 6)}...</span>
-                          <ExternalLink size={8} />
-                        </button>
-                      ) : (
-                        <span className="text-[10px] text-gray-400 bg-gray-50 px-2 py-0.5 rounded-full">
-                           No GPS
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                  
-                  <button 
-                    onClick={() => handleClaim(donation.id)}
-                    disabled={donation.status === 'reserved'}
-                    className={`mt-3 w-full py-2 text-xs font-bold rounded-lg transition-all ${
-                      donation.status === 'reserved' 
-                        ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                        : 'bg-gray-900 text-white active:scale-95'
-                    }`}
-                  >
-                    {donation.status === 'reserved' ? 'Claimed / Reserved' : 'Claim for Pickup'}
-                  </button>
+                <div className="text-right text-xs text-gray-400">
+                  {new Date(pickup.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                 </div>
               </div>
-            ))}
-          </div>
-        )}
+
+              <div className="mt-4 space-y-3">
+                 {/* LOCATION ROW */}
+                <div className="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
+                   <div className="flex items-center gap-2 text-sm text-gray-700 truncate mr-2">
+                      <MapPin size={16} className="text-gray-400 shrink-0" />
+                      <span className="truncate">{pickup.address}</span>
+                   </div>
+                   <button 
+                     onClick={() => openMaps(pickup.address)}
+                     className="shrink-0 text-xs bg-white border border-gray-200 text-gray-700 font-bold px-3 py-1.5 rounded hover:bg-gray-100 flex items-center gap-1"
+                   >
+                     View Map <ExternalLink size={12}/>
+                   </button>
+                </div>
+              </div>
+
+              <div className="mt-6 flex gap-3">
+                {/* CLAIM BUTTON */}
+                <button 
+                  onClick={() => claimDonation(pickup.id)}
+                  className="flex-1 bg-green-600 text-white font-bold py-3 rounded-xl hover:bg-green-700 transition-colors flex items-center justify-center gap-2"
+                >
+                  <CheckCircle size={18} /> Accept Pickup
+                </button>
+
+                {/* CALL BUTTON (Uses real number) */}
+                <a 
+                  href={`tel:${pickup.phone}`}
+                  className="px-6 py-3 border border-gray-200 rounded-xl hover:bg-green-50 text-green-700 flex items-center justify-center transition-colors"
+                >
+                  <Phone size={20} />
+                </a>
+              </div>
+            </div>
+          ))}
+
+          {availablePickups.length === 0 && (
+            <div className="text-center py-16 bg-gray-50 rounded-3xl border border-dashed border-gray-200">
+              <div className="mx-auto w-16 h-16 bg-white rounded-full flex items-center justify-center mb-4 text-gray-400 shadow-sm">
+                 <CheckCircle size={32} />
+              </div>
+              <h3 className="text-lg font-bold text-gray-900">All caught up!</h3>
+              <p className="text-gray-500">No active donations needing pickup right now.</p>
+            </div>
+          )}
+        </div>
       </div>
-    </div>
+    </Layout>
   );
 };
 

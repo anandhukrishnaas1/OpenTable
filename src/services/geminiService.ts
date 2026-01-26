@@ -1,8 +1,7 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-// Replace with your API Key
-const API_KEY = "AIzaSyBeB-ExFS6xE_w9rC6MQrQSqTuGAdFk4Vo"; 
-
+// Your API Key
+const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
 const genAI = new GoogleGenerativeAI(API_KEY);
 
 export interface ScanResult {
@@ -14,11 +13,11 @@ export interface ScanResult {
 }
 
 export const analyzeFoodImage = async (imageBase64: string): Promise<ScanResult> => {
-  // The standard, stable model used in the initial setup
-  const model = genAI.getGenerativeModel({ model: "gemini-pro-vision" });
+  // 1. Use the correct model (gemini-pro-vision is dead, use this instead)
+  const model = genAI.getGenerativeModel({ model: "gemini-3-flash-preview" });
 
   try {
-    // Clean the base64 string if it has the data header
+    // Clean the base64 string
     const base64Data = imageBase64.includes("base64,") 
       ? imageBase64.split("base64,")[1] 
       : imageBase64;

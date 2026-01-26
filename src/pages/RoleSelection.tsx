@@ -1,52 +1,59 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
-import { Heart, Users, Leaf } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { Layout } from '../components/Layout';
+import { Heart, Truck, Leaf } from 'lucide-react';
 
 const RoleSelection: React.FC = () => {
+  const navigate = useNavigate();
+
   return (
     <Layout>
-      <div className="max-w-4xl mx-auto px-6 py-20 text-center">
-        <div className="bg-green-600 w-16 h-16 rounded-full flex items-center justify-center text-white mx-auto mb-6 shadow-lg shadow-green-200">
+      <div className="max-w-4xl mx-auto px-6 py-16 text-center">
+        <div className="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center text-green-600 mx-auto mb-6">
           <Leaf size={32} />
         </div>
-        <h2 className="text-3xl font-bold text-gray-900 mb-2">Welcome to FreshLink</h2>
-        <p className="text-gray-500 mb-12">Choose how you want to make a difference</p>
+        
+        <h1 className="text-3xl md:text-4xl font-extrabold text-gray-900 mb-4">
+          How do you want to help?
+        </h1>
+        <p className="text-gray-500 mb-12 text-lg">
+          Choose your role to get started with FreshLink.
+        </p>
 
-        <div className="grid md:grid-cols-2 gap-8">
-          {/* Donor Card */}
-          <div className="border-2 border-green-600 bg-white p-8 rounded-3xl shadow-sm hover:shadow-xl transition-all group flex flex-col items-center">
-            <div className="bg-green-50 p-6 rounded-full text-green-600 mb-6 group-hover:scale-110 transition-transform">
-              <Heart size={40} />
+        <div className="grid md:grid-cols-2 gap-8 max-w-2xl mx-auto">
+          {/* OPTION 1: DONOR */}
+          <button 
+            onClick={() => navigate('/menu')} // <--- FIX: GO DIRECTLY TO MENU
+            className="group bg-white p-8 rounded-3xl shadow-lg border-2 border-transparent hover:border-green-500 hover:shadow-xl transition-all flex flex-col items-center gap-6 text-center cursor-pointer"
+          >
+            <div className="bg-green-100 p-6 rounded-full text-green-600 group-hover:bg-green-600 group-hover:text-white transition-colors">
+              <Heart size={48} />
             </div>
-            <h3 className="text-xl font-bold text-gray-900 mb-3">I want to Donate</h3>
-            <p className="text-gray-500 text-sm mb-8 leading-relaxed max-w-xs mx-auto">
-              Share excess food from your restaurant, store, or home and track your impact.
-            </p>
-            <Link 
-              to="/login?role=donor"
-              className="bg-green-600 text-white px-8 py-3 rounded-lg font-bold w-full hover:bg-green-700 transition-colors"
-            >
+            <div>
+              <h3 className="text-2xl font-bold text-gray-900 mb-2">Donate Food</h3>
+              <p className="text-gray-500">I have surplus food to share with my community.</p>
+            </div>
+            <div className="mt-4 w-full bg-green-50 text-green-700 py-3 rounded-xl font-bold group-hover:bg-green-600 group-hover:text-white transition-colors">
               Continue as Donor
-            </Link>
-          </div>
-
-          {/* Volunteer Card */}
-          <div className="border border-gray-200 bg-white p-8 rounded-3xl shadow-sm hover:shadow-xl hover:border-green-200 transition-all group flex flex-col items-center">
-            <div className="bg-orange-50 p-6 rounded-full text-orange-600 mb-6 group-hover:scale-110 transition-transform">
-              <Users size={40} />
             </div>
-            <h3 className="text-xl font-bold text-gray-900 mb-3">I want to Volunteer</h3>
-            <p className="text-gray-500 text-sm mb-8 leading-relaxed max-w-xs mx-auto">
-              Help deliver food donations to those in need and earn community rewards.
-            </p>
-            <Link 
-              to="/login?role=volunteer"
-              className="bg-green-50 text-green-700 px-8 py-3 rounded-lg font-bold w-full hover:bg-green-100 transition-colors"
-            >
+          </button>
+
+          {/* OPTION 2: VOLUNTEER */}
+          <button 
+            onClick={() => navigate('/volunteer')} // <--- FIX: GO DIRECTLY TO VOLUNTEER
+            className="group bg-white p-8 rounded-3xl shadow-lg border-2 border-transparent hover:border-blue-500 hover:shadow-xl transition-all flex flex-col items-center gap-6 text-center cursor-pointer"
+          >
+            <div className="bg-blue-100 p-6 rounded-full text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-colors">
+              <Truck size={48} />
+            </div>
+            <div>
+              <h3 className="text-2xl font-bold text-gray-900 mb-2">Volunteer</h3>
+              <p className="text-gray-500">I can pick up food and deliver it to those in need.</p>
+            </div>
+             <div className="mt-4 w-full bg-blue-50 text-blue-700 py-3 rounded-xl font-bold group-hover:bg-blue-600 group-hover:text-white transition-colors">
               Continue as Volunteer
-            </Link>
-          </div>
+            </div>
+          </button>
         </div>
       </div>
     </Layout>

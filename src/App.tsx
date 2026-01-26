@@ -1,26 +1,34 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { AuthProvider } from './contexts/AuthContext';
+import { DonationProvider } from './contexts/DonationContext';
+
+// Import your pages
 import LandingPage from './pages/LandingPage';
 import LoginPage from './pages/LoginPage';
-import DashboardSelection from './pages/DashboardSelection';
+import RoleSelection from './pages/RoleSelection'; // <--- IMPORT THIS
 import DonorDashboard from './pages/DonorDashboard';
 import VolunteerDashboard from './pages/VolunteerDashboard';
-import { AuthProvider } from './contexts/AuthContext';
 
-const App: React.FC = () => {
+function App() {
   return (
-    <BrowserRouter>
+    <DonationProvider>
       <AuthProvider>
-        <Routes>
-          <Route path="/" element={<LandingPage />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/menu" element={<DashboardSelection />} />
-          <Route path="/donate" element={<DonorDashboard />} />
-          <Route path="/volunteer" element={<VolunteerDashboard />} />
-        </Routes>
+        <Router>
+          <Routes>
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/login" element={<LoginPage />} />
+            
+            {/* NEW ROUTE FOR ROLE SELECTION */}
+            <Route path="/role-selection" element={<RoleSelection />} />
+            
+            <Route path="/menu" element={<DonorDashboard />} />
+            <Route path="/volunteer" element={<VolunteerDashboard />} />
+          </Routes>
+        </Router>
       </AuthProvider>
-    </BrowserRouter>
+    </DonationProvider>
   );
-};
+}
 
 export default App;

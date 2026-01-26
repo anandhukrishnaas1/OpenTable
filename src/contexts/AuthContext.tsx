@@ -1,11 +1,13 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, onAuthStateChanged } from 'firebase/auth';
-import { auth, signInWithGoogle, logout } from '../services/firebase';
+import { auth, signInWithGoogle, logout, loginWithEmail, registerWithEmail } from '../services/firebase';
 
 interface AuthContextType {
   user: User | null;
   loading: boolean;
-  signIn: () => Promise<void>;
+  signInGoogle: () => Promise<void>;
+  signInEmail: (email: string, pass: string) => Promise<void>;
+  signUpEmail: (email: string, pass: string, name: string, phone: string) => Promise<void>;
   signOut: () => Promise<void>;
 }
 
@@ -25,15 +27,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return unsubscribe;
   }, []);
 
-  const value = {
-    user,
-    loading,
-    signIn: signInWithGoogle,
-    signOut: logout
+  const signInGoogle = async () => {
+    await signInWithGoogle();
+  };
+
+  const signInEmail = async (email: string, pass: string) => {
+    await loginWithEmail(email, pass);
+  };
+
+  const signUpEmail = async (email: string, pass: string, name: string, phone: string) => {
+    await registerWithEmail(email, pass, name, phone);
+  };
+
+  const signOut = async () => {
+    await logout();
   };
 
   return (
-    <AuthContext.Provider value={value}>
+    <AuthContext.Provider value={{ user, loading, signInGoogle, signInEmail, signUpEmail, signOut }}>
       {!loading && children}
     </AuthContext.Provider>
   );

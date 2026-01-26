@@ -22,3 +22,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Security (ADD THIS LINE)
+.env
+.env.local
