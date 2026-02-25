@@ -1,8 +1,0 @@
-
-{
-  "name": "FreshCheck AI",
-  "description": "An AI-powered food waste prevention app that analyzes food images to determine freshness, safety, and estimated expiration time.",
-  "requestFramePermissions": [
-    "camera"
-  ]
-}
