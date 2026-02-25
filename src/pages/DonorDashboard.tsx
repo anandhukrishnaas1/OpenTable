@@ -216,6 +216,28 @@ const DonorDashboard: React.FC = () => {
                       <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold">{scanResult.category}</span>
                     </div>
 
+                    {/* Expiry & Confidence */}
+                    <div className="flex gap-3">
+                      <div className="flex-1 bg-orange-50 border border-orange-200 rounded-2xl p-4 flex items-center gap-3">
+                        <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center shrink-0">
+                          <span className="text-lg">⏰</span>
+                        </div>
+                        <div>
+                          <p className="text-xs font-bold text-orange-500 uppercase tracking-wider">Expires In</p>
+                          <p className="text-lg font-bold text-orange-700">{scanResult.expiresIn}</p>
+                        </div>
+                      </div>
+                      <div className="bg-blue-50 border border-blue-200 rounded-2xl p-4 flex items-center gap-3">
+                        <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center shrink-0">
+                          <span className="text-lg">🎯</span>
+                        </div>
+                        <div>
+                          <p className="text-xs font-bold text-blue-500 uppercase tracking-wider">Confidence</p>
+                          <p className="text-lg font-bold text-blue-700">{scanResult.confidence}</p>
+                        </div>
+                      </div>
+                    </div>
+
                     <div className="border-t pt-6">
                       <h3 className="font-bold mb-4">Details</h3>
                       <div className="grid md:grid-cols-2 gap-4">

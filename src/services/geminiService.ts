@@ -21,11 +21,18 @@ export const analyzeFoodImage = async (imageBase64: string): Promise<ScanResult>
       dataUrl = `data:image/jpeg;base64,${imageBase64}`;
     }
 
-    const prompt = `Analyze this image of food. Return ONLY a valid JSON object with these fields:
-- item: Name of the food (be specific, e.g. "Red Grapes", "Banana Bunch")
-- category: One of [Produce, Bakery, Dairy, Canned, Prepared Meal]
-- expiresIn: Estimated shelf life from now (e.g., "3 days", "1 week")
-- safeToEat: "Yes" if it looks fresh/edible, "No" if visible mold/rot/spoilage
+    const prompt = `You are a food safety expert. Analyze this food image carefully and return ONLY a valid JSON object with these fields:
+- item: Name of the food (be specific, e.g. "Red Grapes", "Banana Bunch", "Cooked Biryani")
+- category: One of [Produce, Bakery, Dairy, Canned, Prepared Meal, Snacks, Beverages]
+- expiresIn: Estimated time before the food becomes unsafe to consume. Be very precise and realistic:
+  * If the food looks OLD, wilting, slightly brown, or stale → use HOURS (e.g. "3 hours", "6 hours")
+  * If the food looks FRESH and properly stored → use DAYS (e.g. "1 day", "2 days")
+  * If the food is very fresh and properly packaged → up to "4 days" maximum
+  * Cooked/prepared meals: maximum "1 day" unless refrigerated
+  * Bakery items: "1 day" to "2 days"
+  * Fresh produce: "2 days" to "4 days" depending on condition
+  * NEVER exceed "5 days". Be conservative for safety.
+- safeToEat: "Yes" if it looks fresh/edible, "No" if visible mold/rot/spoilage/contamination
 - confidence: A percentage of how confident you are (e.g., "95%")
 
 Return ONLY the JSON object, no markdown, no code fences, no explanation.`;
