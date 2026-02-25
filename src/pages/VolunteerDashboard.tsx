@@ -225,9 +225,44 @@ const VolunteerDashboard: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="bg-gray-50 p-5 rounded-2xl mb-8 border border-gray-100/50">
+                {/* Drop-off Location + Live Map */}
+                <div className="bg-gray-50 p-5 rounded-2xl mb-4 border border-gray-100/50">
                   <p className="font-bold text-sm text-gray-700 flex items-center gap-2 mb-1"><MapPin size={16} /> Drop-off Location</p>
-                  <p className="text-gray-600 text-sm ml-6">{delivery.address}</p>
+                  <p className="text-gray-600 text-sm ml-6 mb-3">{delivery.address}</p>
+
+                  {/* Embedded Google Maps */}
+                  <div className="rounded-xl overflow-hidden border border-gray-200 mb-3">
+                    <iframe
+                      title={`Map to ${delivery.item}`}
+                      width="100%"
+                      height="200"
+                      style={{ border: 0 }}
+                      loading="lazy"
+                      referrerPolicy="no-referrer-when-downgrade"
+                      src={`https://www.google.com/maps/embed/v1/directions?key=AIzaSyAclXt_s4rFmAO_L6J89faIgB7ALcEoPKA&origin=My+Location&destination=${encodeURIComponent(delivery.address)}&mode=driving`}
+                    />
+                  </div>
+
+                  {/* Navigation buttons */}
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => {
+                        const dest = delivery.address.includes('Lat:')
+                          ? delivery.address.replace('Lat:', '').replace('Long:', '').replace(/\s/g, '')
+                          : encodeURIComponent(delivery.address);
+                        window.open(`https://www.google.com/maps/dir/?api=1&destination=${dest}&travelmode=driving`, '_blank');
+                      }}
+                      className="flex-1 flex items-center justify-center gap-2 bg-blue-600 text-white font-bold py-3 rounded-xl hover:bg-blue-700 transition-all shadow-sm"
+                    >
+                      <MapPin size={16} /> Navigate Now
+                    </button>
+                    <a
+                      href={`tel:${delivery.phone}`}
+                      className="px-6 py-3 border border-gray-200 rounded-xl hover:bg-green-50 text-green-700 flex items-center justify-center transition-colors"
+                    >
+                      <Phone size={18} />
+                    </a>
+                  </div>
                 </div>
 
                 {/* Photo Evidence Section */}

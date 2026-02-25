@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, onAuthStateChanged } from 'firebase/auth';
 import { auth, signInWithGoogle, logout, loginWithEmail, registerWithEmail, db } from '../services/firebase';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, onSnapshot } from 'firebase/firestore';
 
 interface AuthContextType {
   user: User | null;
@@ -25,34 +25,47 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+    let unsubscribeRole: (() => void) | null = null;
+
+    const unsubscribeAuth = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
 
+      // Clean up previous role listener
+      if (unsubscribeRole) {
+        unsubscribeRole();
+        unsubscribeRole = null;
+      }
+
       if (currentUser) {
-        try {
-          // Check user role in Firestore
-          const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
-          if (userDoc.exists()) {
-            const role = userDoc.data().role;
+        // Real-time listener on user document — role changes reflect instantly
+        const userDocRef = doc(db, 'users', currentUser.uid);
+        unsubscribeRole = onSnapshot(userDocRef, (docSnap) => {
+          if (docSnap.exists()) {
+            const role = docSnap.data().role;
             setIsAdmin(role === 'admin');
             setIsVerifiedVolunteer(role === 'volunteer');
           } else {
             setIsAdmin(false);
             setIsVerifiedVolunteer(false);
           }
-        } catch (e) {
-          console.error("Error fetching user role", e);
+          setLoading(false);
+        }, (error) => {
+          console.error("Error listening to user role:", error);
           setIsAdmin(false);
           setIsVerifiedVolunteer(false);
-        }
+          setLoading(false);
+        });
       } else {
         setIsAdmin(false);
         setIsVerifiedVolunteer(false);
+        setLoading(false);
       }
-
-      setLoading(false);
     });
-    return unsubscribe;
+
+    return () => {
+      unsubscribeAuth();
+      if (unsubscribeRole) unsubscribeRole();
+    };
   }, []);
 
   const signInGoogle = async () => {
