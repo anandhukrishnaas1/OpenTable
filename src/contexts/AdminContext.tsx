@@ -32,6 +32,7 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     const [applications, setApplications] = useState<VolunteerApplication[]>([]);
 
     useEffect(() => {
+        console.log("AdminContext: Setting up Firestore listener on 'applications' collection...");
         const q = collection(db, 'applications');
         const unsubscribe = onSnapshot(q, (snapshot) => {
             const apps: VolunteerApplication[] = [];
@@ -44,7 +45,11 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
                 const timeB = b.submittedAt ? new Date(b.submittedAt).getTime() : 0;
                 return timeB - timeA;
             });
+            console.log("AdminContext: Loaded", apps.length, "applications from Firestore:", apps.map(a => ({ id: a.id, status: a.status, email: a.email })));
             setApplications(apps);
+        }, (error) => {
+            console.error("AdminContext: Firestore onSnapshot ERROR:", error.code, error.message);
+            console.error("This usually means your Firestore Security Rules are blocking reads. Go to Firebase Console → Firestore → Rules and allow authenticated read/write.");
         });
         return () => unsubscribe();
     }, []);
