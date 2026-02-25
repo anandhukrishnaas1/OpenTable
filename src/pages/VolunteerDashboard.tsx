@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { Layout } from '../components/Layout';
-import { MapPin, Phone, CheckCircle, Clock, ExternalLink, Camera, Upload, X, Truck } from 'lucide-react';
+import { MapPin, Phone, CheckCircle, Clock, ExternalLink, Camera, Upload, X, Truck, AlertTriangle } from 'lucide-react';
+import { DonationItem } from '../contexts/DonationContext';
 import { useDonations } from '../contexts/DonationContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useAdmin } from '../contexts/AdminContext';
@@ -14,7 +15,45 @@ const VolunteerDashboard: React.FC = () => {
   const { user, isVerifiedVolunteer } = useAuth();
   const { applications } = useAdmin();
 
-  const [activeTab, setActiveTab] = useState<'available' | 'mydeliveries' | 'completed'>('available');
+  const [activeTab, setActiveTab] = useState<'available' | 'mydeliveries' | 'completed' | 'expired'>('available');
+
+  // Helper: parse expiresIn string and check if a donation has expired
+  const getExpiryInfo = (donation: DonationItem): { expired: boolean; remainingText: string } => {
+    if (!donation.expiresIn || !donation.timestamp) {
+      return { expired: false, remainingText: 'Unknown' };
+    }
+
+    const expiresIn = donation.expiresIn.toLowerCase();
+    let totalMs = 0;
+
+    // Parse "X hours" or "X days" or "X day"
+    const hoursMatch = expiresIn.match(/(\d+)\s*hour/);
+    const daysMatch = expiresIn.match(/(\d+)\s*day/);
+
+    if (hoursMatch) totalMs += parseInt(hoursMatch[1]) * 60 * 60 * 1000;
+    if (daysMatch) totalMs += parseInt(daysMatch[1]) * 24 * 60 * 60 * 1000;
+    if (totalMs === 0) totalMs = 24 * 60 * 60 * 1000; // fallback: 1 day
+
+    const donatedAt = new Date(donation.timestamp).getTime();
+    const expiryTime = donatedAt + totalMs;
+    const now = Date.now();
+    const remaining = expiryTime - now;
+
+    if (remaining <= 0) return { expired: true, remainingText: 'Expired' };
+
+    const remainingHours = Math.floor(remaining / (60 * 60 * 1000));
+    const remainingMins = Math.floor((remaining % (60 * 60 * 1000)) / (60 * 1000));
+
+    if (remainingHours >= 24) {
+      const days = Math.floor(remainingHours / 24);
+      const hrs = remainingHours % 24;
+      return { expired: false, remainingText: `${days}d ${hrs}h left` };
+    }
+    if (remainingHours > 0) {
+      return { expired: false, remainingText: `${remainingHours}h ${remainingMins}m left` };
+    }
+    return { expired: false, remainingText: `${remainingMins}m left` };
+  };
 
   // Camera & Form States for Proof of Delivery
   const [selectedDonationId, setSelectedDonationId] = useState<string | null>(null);
@@ -28,8 +67,10 @@ const VolunteerDashboard: React.FC = () => {
   // Check verification: either from user's own role OR from the applications list
   const isVerified = isVerifiedVolunteer || applications.some(app => app.email === user?.email && app.status === 'Verified');
 
-  // Filter only 'active' donations for the volunteer to see
-  const availablePickups = donations.filter(d => d.status === 'active');
+  // Filter donations with expiry awareness
+  const allActive = donations.filter(d => d.status === 'active');
+  const availablePickups = allActive.filter(d => !getExpiryInfo(d).expired);
+  const expiredDonations = allActive.filter(d => getExpiryInfo(d).expired);
   const myDeliveries = donations.filter(d => d.status === 'claimed' && d.claimedBy === user?.email);
   const completedDeliveries = donations.filter(d => d.status === 'delivered' && d.claimedBy === user?.email);
 
@@ -125,6 +166,15 @@ const VolunteerDashboard: React.FC = () => {
           >
             Completed ({completedDeliveries.length})
           </button>
+          {expiredDonations.length > 0 && (
+            <button
+              onClick={() => setActiveTab('expired')}
+              className={`flex-1 py-3 px-6 rounded-full text-sm font-bold transition-all ${activeTab === 'expired' ? 'bg-white text-red-700 shadow-sm' : 'text-gray-500 hover:text-gray-900'
+                }`}
+            >
+              Expired ({expiredDonations.length})
+            </button>
+          )}
         </div>
 
         {activeTab === 'available' && (
@@ -139,9 +189,16 @@ const VolunteerDashboard: React.FC = () => {
                     <div>
                       <h3 className="text-xl font-bold text-gray-900">{pickup.item}</h3>
                       <p className="text-green-600 font-medium">{pickup.quantity}</p>
-                      <span className="inline-block mt-2 bg-gray-100 text-gray-600 text-xs font-bold px-2 py-1 rounded">
-                        {pickup.donorType}
-                      </span>
+                      <div className="flex items-center gap-2 mt-2">
+                        <span className="bg-gray-100 text-gray-600 text-xs font-bold px-2 py-1 rounded">
+                          {pickup.donorType}
+                        </span>
+                        {pickup.expiresIn && (
+                          <span className="bg-orange-50 text-orange-700 text-xs font-bold px-2 py-1 rounded flex items-center gap-1">
+                            <Clock size={12} /> {getExpiryInfo(pickup).remainingText}
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </div>
                   <div className="text-right text-xs text-gray-400">
@@ -355,6 +412,48 @@ const VolunteerDashboard: React.FC = () => {
                 <CheckCircle size={48} className="mx-auto mb-4 text-gray-300" />
                 <h3 className="text-lg font-bold text-gray-900">No completed deliveries yet</h3>
                 <p className="text-gray-500">Once you deliver food and submit proof, they will appear here.</p>
+              </div>
+            )}
+          </div>
+        )}
+        {/* EXPIRED DONATIONS TAB */}
+        {activeTab === 'expired' && (
+          <div className="grid gap-8">
+            <div className="bg-red-50 border border-red-200 rounded-2xl p-4 flex items-center gap-3">
+              <AlertTriangle size={20} className="text-red-500 shrink-0" />
+              <p className="text-sm text-red-700 font-medium">These food items have passed their estimated safe consumption window and can no longer be accepted for delivery.</p>
+            </div>
+
+            {expiredDonations.map((item) => (
+              <div key={item.id} className="bg-white p-8 rounded-[2rem] shadow-[0_4px_20px_rgb(0,0,0,0.03)] border border-red-100 opacity-75">
+                <div className="flex justify-between items-start gap-4">
+                  <div className="flex gap-4">
+                    {item.imageUrl && (
+                      <img src={item.imageUrl} alt={item.item} className="w-24 h-24 rounded-xl object-cover bg-gray-100 grayscale" />
+                    )}
+                    <div>
+                      <h3 className="text-xl font-bold text-gray-900">{item.item}</h3>
+                      <p className="text-gray-400 font-medium">{item.quantity}</p>
+                      <div className="flex items-center gap-2 mt-2">
+                        <span className="bg-gray-100 text-gray-600 text-xs font-bold px-2 py-1 rounded">{item.donorType}</span>
+                        <span className="bg-red-100 text-red-700 text-xs font-bold px-2 py-1 rounded flex items-center gap-1">
+                          <AlertTriangle size={12} /> Expired
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                {item.expiresIn && (
+                  <p className="text-xs text-gray-400 mt-3">Original shelf life: {item.expiresIn} from donation</p>
+                )}
+              </div>
+            ))}
+
+            {expiredDonations.length === 0 && (
+              <div className="text-center py-16 bg-gray-50 rounded-3xl border border-dashed border-gray-200">
+                <CheckCircle size={48} className="mx-auto mb-4 text-green-300" />
+                <h3 className="text-lg font-bold text-gray-900">No expired items</h3>
+                <p className="text-gray-500">All donations are still within their safe consumption window.</p>
               </div>
             )}
           </div>

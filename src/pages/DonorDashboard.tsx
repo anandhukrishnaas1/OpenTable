@@ -121,7 +121,8 @@ const DonorDashboard: React.FC = () => {
         address: address,
         status: 'active',
         timestamp: new Date(),
-        imageUrl: imageUrl
+        imageUrl: imageUrl,
+        expiresIn: scanResult.expiresIn
       };
 
       await addDonation(newDonation);
