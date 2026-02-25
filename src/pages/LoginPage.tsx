@@ -43,10 +43,15 @@ const LoginPage: React.FC = () => {
 
   const handleGoogleLogin = async () => {
     try {
+      setError('');
+      setLoading(true);
       await signInGoogle();
       navigate('/role-selection');
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
+      setError("Google Login Error: " + err.message.replace('Firebase: ', ''));
+    } finally {
+      setLoading(false);
     }
   };
 
