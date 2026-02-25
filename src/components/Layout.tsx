@@ -35,7 +35,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
             {!isHomePage && (
               <button
                 onClick={() => navigate(-1)}
-                className="p-2 bg-gray-50 hover:bg-gray-100 rounded-full transition-colors hidden sm:block shadow-sm border border-gray-100"
+                className="p-2 bg-gray-50 hover:bg-gray-100 rounded-full transition-colors shadow-sm border border-gray-100"
                 title="Go Back"
               >
                 <ArrowLeft size={20} className="text-gray-600" />
