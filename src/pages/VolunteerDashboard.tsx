@@ -239,7 +239,7 @@ const VolunteerDashboard: React.FC = () => {
                       style={{ border: 0 }}
                       loading="lazy"
                       referrerPolicy="no-referrer-when-downgrade"
-                      src={`https://www.google.com/maps/embed/v1/directions?key=AIzaSyAclXt_s4rFmAO_L6J89faIgB7ALcEoPKA&origin=My+Location&destination=${encodeURIComponent(delivery.address)}&mode=driving`}
+                      src={`https://maps.google.com/maps?q=${encodeURIComponent(delivery.address)}&output=embed`}
                     />
                   </div>
 
