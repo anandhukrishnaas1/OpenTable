@@ -51,7 +51,7 @@ const Toast: React.FC<ToastProps> = ({ message, type, isVisible, onClose, durati
     const c = config[type];
 
     return (
-        <div className="fixed top-6 left-1/2 -translate-x-1/2 z-[9999] animate-slide-down w-[90vw] max-w-md">
+        <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[9999] animate-slide-down w-[90vw] max-w-md">
             <div className={`${c.bg} border rounded-2xl shadow-xl overflow-hidden`}>
                 <div className={`${c.bar} h-1 animate-shrink-bar`} style={{ animationDuration: `${duration}ms` }} />
                 <div className="flex items-start gap-3 p-4">
