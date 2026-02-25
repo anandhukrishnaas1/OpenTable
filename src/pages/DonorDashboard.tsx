@@ -7,13 +7,13 @@ import { useDonations, DonationItem } from '../contexts/DonationContext'; // <--
 const DonorDashboard: React.FC = () => {
   const { donations, addDonation } = useDonations(); // <--- USE CONTEXT
   const [activeTab, setActiveTab] = useState<'scan' | 'active' | 'history'>('scan');
-  
+
   // Camera & Form States
   const [image, setImage] = useState<string | null>(null);
   const [isCameraOpen, setIsCameraOpen] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  
+
   const [analyzing, setAnalyzing] = useState(false);
   const [scanResult, setScanResult] = useState<ScanResult | null>(null);
 
@@ -45,7 +45,7 @@ const DonorDashboard: React.FC = () => {
       canvas.getContext('2d')?.drawImage(video, 0, 0);
       const photoData = canvas.toDataURL('image/jpeg');
       setImage(photoData);
-      
+
       const stream = video.srcObject as MediaStream;
       stream.getTracks().forEach(track => track.stop());
       setIsCameraOpen(false);
@@ -70,8 +70,8 @@ const DonorDashboard: React.FC = () => {
     try {
       const result = await analyzeFoodImage(imageBase64);
       setScanResult(result);
-    } catch (error) {
-      alert("Analysis failed.");
+    } catch (error: any) {
+      alert("Analysis failed: " + error.message);
     } finally {
       setAnalyzing(false);
     }
@@ -110,7 +110,7 @@ const DonorDashboard: React.FC = () => {
     };
 
     addDonation(newDonation); // <--- SEND TO SHARED CONTEXT
-    
+
     // Reset
     setImage(null);
     setScanResult(null);
@@ -130,14 +130,13 @@ const DonorDashboard: React.FC = () => {
     <Layout>
       <div className="max-w-3xl mx-auto px-4 py-8">
         {/* TABS */}
-        <div className="bg-white rounded-xl p-1 mb-8 flex shadow-sm border border-gray-100">
+        <div className="bg-gray-100/80 rounded-full p-1.5 mb-10 flex shadow-sm border border-gray-100">
           {['scan', 'active', 'history'].map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab as any)}
-              className={`flex-1 py-3 px-4 rounded-lg text-sm font-bold transition-all capitalize ${
-                activeTab === tab ? 'bg-green-100 text-green-700 shadow-sm' : 'text-gray-500 hover:text-gray-900'
-              }`}
+              className={`flex-1 py-3 px-6 rounded-full text-sm font-bold transition-all capitalize ${activeTab === tab ? 'bg-white text-green-700 shadow-sm' : 'text-gray-500 hover:text-gray-900'
+                }`}
             >
               {tab === 'scan' ? 'Snap & Donate' : tab}
             </button>
@@ -147,17 +146,17 @@ const DonorDashboard: React.FC = () => {
         {/* TAB CONTENT: SCAN */}
         {activeTab === 'scan' && (
           <div className="space-y-6">
-             {/* 1. CAMERA / UPLOAD BUTTONS */}
-             {!image && !isCameraOpen && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <button onClick={startCamera} className="bg-green-600 text-white rounded-2xl p-8 flex flex-col items-center justify-center gap-4 hover:bg-green-700 transition-all shadow-lg">
-                  <div className="bg-white/20 p-4 rounded-full"><Camera size={40} /></div>
-                  <span className="font-bold text-lg">Open Camera</span>
+            {/* 1. CAMERA / UPLOAD BUTTONS */}
+            {!image && !isCameraOpen && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <button onClick={startCamera} className="bg-green-600 text-white rounded-[2rem] p-10 flex flex-col items-center justify-center gap-4 hover:bg-green-700 transition-all shadow-[0_8px_30px_rgb(0,0,0,0.08)] hover:-translate-y-1">
+                  <div className="bg-white/20 p-5 rounded-full"><Camera size={48} /></div>
+                  <span className="font-bold text-xl">Open Camera</span>
                 </button>
-                <label className="bg-white border-2 border-dashed border-gray-300 rounded-2xl p-8 flex flex-col items-center justify-center gap-4 hover:border-green-500 transition-all cursor-pointer">
+                <label className="bg-white border-2 border-dashed border-gray-200 rounded-[2rem] p-10 flex flex-col items-center justify-center gap-4 hover:border-green-400 hover:bg-green-50 transition-all cursor-pointer shadow-[0_8px_30px_rgb(0,0,0,0.02)]">
                   <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
-                  <div className="bg-gray-100 p-4 rounded-full text-gray-500"><Upload size={40} /></div>
-                  <span className="font-bold text-gray-600">Upload Photo</span>
+                  <div className="bg-green-50 p-5 rounded-full text-green-600"><Upload size={48} /></div>
+                  <span className="font-bold text-gray-700 text-xl">Upload Photo</span>
                 </label>
               </div>
             )}
@@ -179,8 +178,8 @@ const DonorDashboard: React.FC = () => {
 
             {/* 3. PREVIEW & FORM */}
             {image && (
-              <div className="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100">
-                <div className="relative h-64 bg-gray-100">
+              <div className="bg-white rounded-[2.5rem] shadow-[0_8px_30px_rgb(0,0,0,0.06)] overflow-hidden border border-gray-100">
+                <div className="relative h-72 bg-gray-100">
                   <img src={image} alt="Scan" className="w-full h-full object-cover" />
                   <button onClick={() => { setImage(null); setScanResult(null); }} className="absolute top-4 right-4 bg-white/90 p-2 rounded-full text-gray-600 hover:text-red-600"><RefreshCw size={20} /></button>
                   {analyzing && (
@@ -200,37 +199,41 @@ const DonorDashboard: React.FC = () => {
                     <div className="border-t pt-6">
                       <h3 className="font-bold mb-4">Details</h3>
                       <div className="grid md:grid-cols-2 gap-4">
-<div className="flex flex-col">
-  <label className="text-xs font-bold text-gray-500 mb-1 ml-1">Donor Type</label>
-  <select 
-    value={donorType} 
-    onChange={e => setDonorType(e.target.value)} 
-    className="p-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500"
-  >
-    <option value="Individual">Individual</option>
-    <option value="Restaurant">Restaurant</option>
-    <option value="Grocery Store">Grocery Store</option>
-    <option value="Bakery">Bakery</option>
-    <option value="Food Bank">Food Bank</option>
-    <option value="Other">Other</option>
-  </select>
-</div>                         <input value={quantity} onChange={e => setQuantity(e.target.value)} className="p-3 bg-gray-50 border rounded-xl" placeholder="Quantity (e.g. 5kg)" />
+                        <div className="flex flex-col">
+                          <label className="text-xs font-bold text-gray-500 mb-1 ml-1">Donor Type</label>
+                          <select
+                            value={donorType}
+                            onChange={e => setDonorType(e.target.value)}
+                            className="p-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500"
+                          >
+                            <option value="Individual">Individual</option>
+                            <option value="Restaurant">Restaurant</option>
+                            <option value="Grocery Store">Grocery Store</option>
+                            <option value="Bakery">Bakery</option>
+                            <option value="Food Bank">Food Bank</option>
+                            <option value="Other">Other</option>
+                          </select>
+                        </div>                         <input value={quantity} onChange={e => setQuantity(e.target.value)} className="p-3 bg-gray-50 border rounded-xl" placeholder="Quantity (e.g. 5kg)" />
                       </div>
                       <input value={contactPhone} onChange={e => setContactPhone(e.target.value)} className="w-full mt-4 p-3 bg-gray-50 border rounded-xl" placeholder="Phone Number" type="tel" />
                     </div>
 
-                    <div className="border-t pt-6">
-                      <h3 className="font-bold mb-4">Location</h3>
-                      <button onClick={handleUseCurrentLocation} className="w-full bg-green-600 text-white font-bold py-3 rounded-xl mb-4">{isLocating ? 'Locating...' : 'Use My GPS Location'}</button>
-                      <input value={address} onChange={e => setAddress(e.target.value)} className="w-full p-3 bg-gray-50 border rounded-xl" placeholder="Or type address manually..." />
+                    <div className="border-t pt-8">
+                      <h3 className="font-bold text-gray-800 mb-5">Location</h3>
+                      <button onClick={handleUseCurrentLocation} className="w-full bg-green-50 hover:bg-green-100 text-green-700 font-bold py-4 rounded-full mb-4 transition-colors">
+                        {isLocating ? 'Locating...' : 'Use My GPS Location'}
+                      </button>
+                      <input value={address} onChange={e => setAddress(e.target.value)} className="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-2 focus:ring-green-500 transition-shadow" placeholder="Or type address manually..." />
                     </div>
 
-                    <button onClick={handleFinalSubmit} className="w-full bg-black text-white font-bold py-4 rounded-xl shadow-lg">Confirm Donation</button>
+                    <div className="pt-4">
+                      <button onClick={handleFinalSubmit} className="w-full bg-gray-900 hover:bg-black text-white font-bold py-4 rounded-full shadow-lg transition-transform hover:-translate-y-0.5">Confirm Donation</button>
+                    </div>
                   </div>
                 )}
-                 {scanResult && scanResult.safeToEat === 'No' && (
-                    <div className="p-6 bg-red-50 text-red-700 font-bold text-center">Item Unsafe to Donate</div>
-                 )}
+                {scanResult && scanResult.safeToEat === 'No' && (
+                  <div className="p-6 bg-red-50 text-red-700 font-bold text-center">Item Unsafe to Donate</div>
+                )}
               </div>
             )}
           </div>
@@ -240,21 +243,22 @@ const DonorDashboard: React.FC = () => {
         {activeTab !== 'scan' && (
           <div className="space-y-4">
             {(activeTab === 'active' ? activeDonations : historyDonations).map((item) => (
-              <div key={item.id} className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex gap-4">
-                 {item.imageUrl && <img src={item.imageUrl} className="w-20 h-20 rounded-lg object-cover bg-gray-100" />}
-                 <div className="flex-1">
-                    <h3 className="font-bold text-lg">{item.item}</h3>
-                    <div className="flex items-center gap-2 mt-1">
-                      <span className={`text-xs font-bold px-2 py-1 rounded ${item.status === 'active' ? 'bg-yellow-100 text-yellow-700' : 'bg-green-100 text-green-700'}`}>
-                        {item.status === 'active' ? 'Waiting for Volunteer' : 'Claimed / Picked Up'}
-                      </span>
-                    </div>
-                    <p className="text-sm text-gray-500 mt-2">{item.quantity} • {item.address}</p>
-                 </div>
+              <div key={item.id} className="bg-white p-6 rounded-[2rem] shadow-[0_4px_20px_rgb(0,0,0,0.03)] border border-gray-100 flex gap-5 transition-all hover:border-gray-200">
+                {item.imageUrl && <img src={item.imageUrl} className="w-24 h-24 rounded-2xl object-cover bg-gray-100 shrink-0" />}
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-bold text-xl text-gray-900 truncate">{item.item}</h3>
+                  <div className="flex flex-wrap items-center gap-2 mt-2">
+                    <span className={`text-xs font-bold px-3 py-1.5 rounded-full ${item.status === 'active' ? 'bg-orange-50 text-orange-700' : 'bg-green-50 text-green-700'}`}>
+                      {item.status === 'active' ? 'Waiting for Pick Up' : 'Claimed / Delivered'}
+                    </span>
+                    <span className="text-xs font-bold bg-gray-100 text-gray-600 px-3 py-1.5 rounded-full">{item.category}</span>
+                  </div>
+                  <p className="text-sm text-gray-500 mt-3 flex items-center gap-1.5 truncate"><Package size={14} /> {item.quantity}  •  <MapPin size={14} /> {item.address}</p>
+                </div>
               </div>
             ))}
-             {activeTab === 'active' && activeDonations.length === 0 && <p className="text-center text-gray-400 py-10">No active donations.</p>}
-             {activeTab === 'history' && historyDonations.length === 0 && <p className="text-center text-gray-400 py-10">No history yet.</p>}
+            {activeTab === 'active' && activeDonations.length === 0 && <p className="text-center text-gray-400 py-10">No active donations.</p>}
+            {activeTab === 'history' && historyDonations.length === 0 && <p className="text-center text-gray-400 py-10">No history yet.</p>}
           </div>
         )}
       </div>
