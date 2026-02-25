@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { LogOut, Leaf, ChevronDown } from 'lucide-react';
+import { LogOut, Leaf, ChevronDown, ArrowLeft } from 'lucide-react';
 import { DoodleBackground } from './DoodleBackground';
 
 export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user, isAdmin, signOut } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const isHomePage = location.pathname === '/';
 
   // Helper to scroll to section if on landing page, or go there
   const scrollToSection = (id: string) => {
@@ -29,10 +31,21 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
       {/* Navbar bg-gray-50/90 */}
       <nav className="border-b border-gray-100 bg-white/90 backdrop-blur-md sticky top-0 z-50">
         <div className="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
-          <Link to="/" className="flex items-center gap-2 group">
-            <img src="/logo.png" alt="OpenTable Logo" className="w-10 h-10 object-contain rounded-xl shadow-sm group-hover:scale-105 transition-transform" />
-            <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-orange-500 to-orange-600 tracking-tight">OpenTable</span>
-          </Link>
+          <div className="flex items-center gap-4">
+            {!isHomePage && (
+              <button
+                onClick={() => navigate(-1)}
+                className="p-2 bg-gray-50 hover:bg-gray-100 rounded-full transition-colors hidden sm:block shadow-sm border border-gray-100"
+                title="Go Back"
+              >
+                <ArrowLeft size={20} className="text-gray-600" />
+              </button>
+            )}
+            <Link to="/" className="flex items-center gap-2 group">
+              <img src="/logo.png" alt="OpenTable Logo" className="w-10 h-10 object-contain rounded-xl shadow-sm group-hover:scale-105 transition-transform" />
+              <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-orange-500 to-orange-600 tracking-tight">OpenTable</span>
+            </Link>
+          </div>
 
           {/* DROPDOWN NAVIGATION */}
           <div className="hidden md:flex items-center gap-8 text-sm font-medium text-gray-600">

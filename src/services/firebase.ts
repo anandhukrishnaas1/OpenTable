@@ -17,6 +17,7 @@ import { getFirestore, doc, setDoc, getDoc } from "firebase/firestore";
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
   authDomain: "opentable01.firebaseapp.com",
+  databaseURL: "https://opentable01-default-rtdb.firebaseio.com",
   projectId: "opentable01",
   storageBucket: "opentable01.firebasestorage.app",
   messagingSenderId: "793476493352",
