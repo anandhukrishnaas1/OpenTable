@@ -2,7 +2,8 @@ import React, { useState, useRef } from 'react';
 import { Camera, Upload, X, CheckCircle, Clock, MapPin, Package, Phone, Navigation, RefreshCw } from 'lucide-react';
 import { Layout } from '../components/Layout';
 import { analyzeFoodImage, ScanResult } from '../services/geminiService';
-import { useDonations, DonationItem } from '../contexts/DonationContext'; // <--- IMPORT CONTEXT
+import { useDonations, DonationItem } from '../contexts/DonationContext';
+import { uploadToCloudinary } from '../services/cloudinary';
 
 const DonorDashboard: React.FC = () => {
   const { donations, addDonation } = useDonations(); // <--- USE CONTEXT
@@ -23,23 +24,6 @@ const DonorDashboard: React.FC = () => {
   const [address, setAddress] = useState('');
   const [isLocating, setIsLocating] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  // Compress image to fit Firestore 1MB document limit
-  const compressImage = (dataUrl: string, maxWidth = 400, quality = 0.5): Promise<string> => {
-    return new Promise((resolve) => {
-      const img = new Image();
-      img.onload = () => {
-        const canvas = document.createElement('canvas');
-        const ratio = Math.min(maxWidth / img.width, maxWidth / img.height);
-        canvas.width = img.width * ratio;
-        canvas.height = img.height * ratio;
-        const ctx = canvas.getContext('2d')!;
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-        resolve(canvas.toDataURL('image/jpeg', quality));
-      };
-      img.src = dataUrl;
-    });
-  };
 
   // --- CAMERA LOGIC (Same as before) ---
   const startCamera = async () => {
@@ -116,10 +100,9 @@ const DonorDashboard: React.FC = () => {
 
     setIsSubmitting(true);
     try {
-      // Compress the image so it fits in Firestore's 1MB document limit
-      let compressedImage: string | undefined = undefined;
+      let cloudinaryUrl: string | undefined = undefined;
       if (image) {
-        compressedImage = await compressImage(image);
+        cloudinaryUrl = await uploadToCloudinary(image);
       }
 
       const newDonation: DonationItem = {
@@ -132,7 +115,7 @@ const DonorDashboard: React.FC = () => {
         address: address,
         status: 'active',
         timestamp: new Date(),
-        imageUrl: compressedImage
+        imageUrl: cloudinaryUrl
       };
 
       await addDonation(newDonation);

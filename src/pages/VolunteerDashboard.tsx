@@ -6,6 +6,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useAdmin } from '../contexts/AdminContext';
 import { Link } from 'react-router-dom';
 import { Shield } from 'lucide-react';
+import { uploadToCloudinary } from '../services/cloudinary';
 
 const VolunteerDashboard: React.FC = () => {
   const { donations, claimDonation, completeDelivery } = useDonations();
@@ -20,6 +21,7 @@ const VolunteerDashboard: React.FC = () => {
   const [isCameraOpen, setIsCameraOpen] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // If ANY application matches this user's email AND is 'Verified', they are good to go!
   const isVerified = applications.some(app => app.email === user?.email && app.status === 'Verified');
@@ -71,12 +73,20 @@ const VolunteerDashboard: React.FC = () => {
     }
   };
 
-  const submitProof = () => {
+  const submitProof = async () => {
     if (selectedDonationId && proofImage) {
-      completeDelivery(selectedDonationId, proofImage);
-      setSelectedDonationId(null);
-      setProofImage(null);
-      alert("Delivery recorded! Thank you for closing the loop.");
+      setIsSubmitting(true);
+      try {
+        const cloudinaryUrl = await uploadToCloudinary(proofImage);
+        await completeDelivery(selectedDonationId, cloudinaryUrl);
+        setSelectedDonationId(null);
+        setProofImage(null);
+        alert("Delivery recorded! Thank you for closing the loop.");
+      } catch (error: any) {
+        alert("Failed to upload proof: " + error.message);
+      } finally {
+        setIsSubmitting(false);
+      }
     }
   };
 
@@ -240,7 +250,9 @@ const VolunteerDashboard: React.FC = () => {
                       <img src={proofImage} className="w-full h-48 object-cover rounded-xl mb-4" />
                       <div className="flex gap-2">
                         <button onClick={() => setProofImage(null)} className="flex-1 bg-gray-100 py-3 rounded-xl font-bold">Retake</button>
-                        <button onClick={submitProof} className="flex-1 bg-green-600 text-white font-bold py-3 rounded-xl shadow-lg">Submit & Close Ticket</button>
+                        <button onClick={submitProof} disabled={isSubmitting} className="flex-1 bg-green-600 text-white font-bold py-3 rounded-xl shadow-lg disabled:bg-green-400">
+                          {isSubmitting ? 'Uploading...' : 'Submit & Close Ticket'}
+                        </button>
                       </div>
                     </div>
                   )}

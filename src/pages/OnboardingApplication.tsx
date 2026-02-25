@@ -4,6 +4,7 @@ import { Layout } from '../components/Layout';
 import { useAdmin } from '../contexts/AdminContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import { uploadToCloudinary } from '../services/cloudinary';
 
 const OnboardingApplication: React.FC = () => {
     const { submitApplication } = useAdmin();
@@ -44,21 +45,26 @@ const OnboardingApplication: React.FC = () => {
         }
 
         setIsSubmitting(true);
-        // Simulate API delay
-        await new Promise(r => setTimeout(r, 1500));
+        try {
+            const idUrl = await uploadToCloudinary(idImage);
+            const selfieUrl = await uploadToCloudinary(selfieImage);
 
-        submitApplication({
-            name,
-            email,
-            idImageUrl: idImage,
-            selfieUrl: selfieImage,
-            backgroundCheckDeclaration: backgroundDeclaration,
-            organizationAffiliation: organization,
-            termsSigned: true
-        });
+            await submitApplication({
+                name,
+                email,
+                idImageUrl: idUrl,
+                selfieUrl: selfieUrl,
+                backgroundCheckDeclaration: backgroundDeclaration,
+                organizationAffiliation: organization,
+                termsSigned: true
+            });
 
-        setIsSubmitting(false);
-        setStep(4); // Success screen
+            setStep(4); // Success screen
+        } catch (error: any) {
+            alert("Failed to upload verification documents: " + error.message);
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     return (
