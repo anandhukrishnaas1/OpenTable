@@ -53,14 +53,18 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         try {
             const newId = Math.random().toString(36).substr(2, 9);
             const appRef = doc(db, 'applications', newId);
-            await setDoc(appRef, {
+            const payload = {
                 ...appData,
                 status: 'Pending',
                 trustScore: 0,
                 submittedAt: new Date().toISOString()
-            });
-        } catch (error) {
-            console.error("Error submitting application:", error);
+            };
+            console.log("Submitting application to Firestore:", newId, payload);
+            await setDoc(appRef, payload);
+            console.log("Application saved successfully:", newId);
+        } catch (error: any) {
+            console.error("Error submitting application to Firestore:", error.code, error.message);
+            throw error;
         }
     };
 
