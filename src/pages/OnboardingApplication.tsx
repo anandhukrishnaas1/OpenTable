@@ -49,14 +49,21 @@ const OnboardingApplication: React.FC = () => {
 
         setIsSubmitting(true);
         try {
-            const idUrl = await uploadToCloudinary(idImage);
-            const selfieUrl = await uploadToCloudinary(selfieImage);
+            // Try uploading to Cloudinary, but fall back to raw images if it fails
+            let idUrl: string = idImage;
+            let selfieUrlFinal: string = selfieImage;
+            try {
+                idUrl = await uploadToCloudinary(idImage);
+                selfieUrlFinal = await uploadToCloudinary(selfieImage);
+            } catch (uploadError) {
+                console.warn("Cloudinary upload failed, using raw images:", uploadError);
+            }
 
             await submitApplication({
                 name,
                 email,
                 idImageUrl: idUrl,
-                selfieUrl: selfieUrl,
+                selfieUrl: selfieUrlFinal,
                 backgroundCheckDeclaration: backgroundDeclaration,
                 organizationAffiliation: organization,
                 termsSigned: true
@@ -64,7 +71,7 @@ const OnboardingApplication: React.FC = () => {
 
             setStep(4); // Success screen
         } catch (error: any) {
-            alert("Failed to upload verification documents: " + error.message);
+            alert("Failed to submit application: " + error.message);
         } finally {
             setIsSubmitting(false);
         }

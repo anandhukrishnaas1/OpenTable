@@ -100,9 +100,13 @@ const DonorDashboard: React.FC = () => {
 
     setIsSubmitting(true);
     try {
-      let cloudinaryUrl: string | undefined = undefined;
+      let imageUrl: string | undefined = undefined;
       if (image) {
-        cloudinaryUrl = await uploadToCloudinary(image);
+        try {
+          imageUrl = await uploadToCloudinary(image);
+        } catch (uploadError) {
+          console.warn("Cloudinary upload failed, saving without image:", uploadError);
+        }
       }
 
       const newDonation: DonationItem = {
@@ -115,7 +119,7 @@ const DonorDashboard: React.FC = () => {
         address: address,
         status: 'active',
         timestamp: new Date(),
-        imageUrl: cloudinaryUrl
+        imageUrl: imageUrl
       };
 
       await addDonation(newDonation);
