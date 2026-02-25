@@ -15,6 +15,7 @@ export interface DonationItem {
   imageUrl?: string;
   claimedBy?: string;
   deliveryProofUrl?: string;
+  clappedByAdmin?: boolean;
 }
 
 interface DonationContextType {
@@ -22,6 +23,7 @@ interface DonationContextType {
   addDonation: (item: DonationItem) => void;
   claimDonation: (id: string, volunteerEmail: string) => void;
   completeDelivery: (id: string, proofUrl: string) => void;
+  clapForDelivery: (id: string) => void;
 }
 
 export const DonationContext = React.createContext<DonationContextType>({} as DonationContextType);
@@ -87,8 +89,19 @@ export const DonationProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
   };
 
+  const clapForDelivery = async (id: string) => {
+    try {
+      const donationRef = doc(db, 'donations', id);
+      await updateDoc(donationRef, {
+        clappedByAdmin: true
+      });
+    } catch (error) {
+      console.error("Error clapping for delivery:", error);
+    }
+  };
+
   return (
-    <DonationContext.Provider value={{ donations, addDonation, claimDonation, completeDelivery }}>
+    <DonationContext.Provider value={{ donations, addDonation, claimDonation, completeDelivery, clapForDelivery }}>
       {children}
     </DonationContext.Provider>
   );

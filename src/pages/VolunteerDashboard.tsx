@@ -14,7 +14,7 @@ const VolunteerDashboard: React.FC = () => {
   const { user } = useAuth();
   const { applications } = useAdmin();
 
-  const [activeTab, setActiveTab] = useState<'available' | 'mydeliveries'>('available');
+  const [activeTab, setActiveTab] = useState<'available' | 'mydeliveries' | 'completed'>('available');
 
   // Camera & Form States for Proof of Delivery
   const [selectedDonationId, setSelectedDonationId] = useState<string | null>(null);
@@ -31,6 +31,7 @@ const VolunteerDashboard: React.FC = () => {
   // Filter only 'active' donations for the volunteer to see
   const availablePickups = donations.filter(d => d.status === 'active');
   const myDeliveries = donations.filter(d => d.status === 'claimed' && d.claimedBy === user?.email);
+  const completedDeliveries = donations.filter(d => d.status === 'delivered' && d.claimedBy === user?.email);
 
   // Helper to open Google Maps
   const openMaps = (address: string) => {
@@ -116,6 +117,13 @@ const VolunteerDashboard: React.FC = () => {
               }`}
           >
             My Deliveries ({myDeliveries.length})
+          </button>
+          <button
+            onClick={() => setActiveTab('completed')}
+            className={`flex-1 py-3 px-6 rounded-full text-sm font-bold transition-all ${activeTab === 'completed' ? 'bg-white text-green-700 shadow-sm' : 'text-gray-500 hover:text-gray-900'
+              }`}
+          >
+            Completed ({completedDeliveries.length})
           </button>
         </div>
 
@@ -269,6 +277,49 @@ const VolunteerDashboard: React.FC = () => {
                 <Truck size={48} className="mx-auto mb-4 text-gray-300" />
                 <h3 className="text-lg font-bold text-gray-900">No active deliveries</h3>
                 <p className="text-gray-500">When you accept a pickup, it will appear here.</p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* COMPLETED DELIVERIES TAB */}
+        {activeTab === 'completed' && (
+          <div className="grid gap-8">
+            {completedDeliveries.map((delivery) => (
+              <div key={delivery.id} className="bg-white p-8 rounded-[2rem] shadow-[0_4px_20px_rgb(0,0,0,0.03)] border border-green-50 transition-all">
+                <div className="flex justify-between items-start mb-4">
+                  <div>
+                    <span className="text-xs font-bold bg-green-50 text-green-700 px-3 py-1.5 rounded-full">✅ Delivered</span>
+                    <h3 className="text-2xl font-bold text-gray-900 mt-3">{delivery.item}</h3>
+                    <p className="text-gray-500 font-medium">{delivery.quantity}</p>
+                  </div>
+                  {delivery.clappedByAdmin && (
+                    <div className="flex items-center gap-2 bg-yellow-50 border border-yellow-200 px-4 py-2 rounded-full animate-bounce">
+                      <span className="text-2xl">👏</span>
+                      <span className="text-sm font-bold text-yellow-700">Admin Applauded!</span>
+                    </div>
+                  )}
+                </div>
+
+                <div className="bg-gray-50 p-4 rounded-2xl mb-4 border border-gray-100/50">
+                  <p className="font-bold text-sm text-gray-700 flex items-center gap-2 mb-1"><MapPin size={16} /> Delivered to</p>
+                  <p className="text-gray-600 text-sm ml-6">{delivery.address}</p>
+                </div>
+
+                {delivery.deliveryProofUrl && (
+                  <div>
+                    <p className="font-bold text-sm text-gray-700 mb-2">📸 Delivery Proof</p>
+                    <img src={delivery.deliveryProofUrl} alt="Delivery proof" className="w-full h-48 object-cover rounded-xl border border-gray-100" />
+                  </div>
+                )}
+              </div>
+            ))}
+
+            {completedDeliveries.length === 0 && (
+              <div className="text-center py-16 bg-gray-50 rounded-3xl border border-dashed border-gray-200">
+                <CheckCircle size={48} className="mx-auto mb-4 text-gray-300" />
+                <h3 className="text-lg font-bold text-gray-900">No completed deliveries yet</h3>
+                <p className="text-gray-500">Once you deliver food and submit proof, they will appear here.</p>
               </div>
             )}
           </div>

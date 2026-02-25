@@ -1,12 +1,16 @@
 import React, { useState } from 'react';
 import { Layout } from '../components/Layout';
 import { useAdmin, VolunteerApplication, ApplicationStatus } from '../contexts/AdminContext';
+import { useDonations } from '../contexts/DonationContext';
 import { Shield, Check, X, Flag, User, AlertTriangle } from 'lucide-react';
 
 const AdminDashboard: React.FC = () => {
     const { applications, updateApplicationStatus } = useAdmin();
+    const { donations, clapForDelivery } = useDonations();
     const [selectedAppId, setSelectedAppId] = useState<string | null>(null);
     const [activeTab, setActiveTab] = useState<'pending' | 'approved' | 'rejected'>('pending');
+
+    const completedDeliveries = donations.filter(d => d.status === 'delivered');
 
     const selectedApp = applications.find(app => app.id === selectedAppId);
 
@@ -187,6 +191,55 @@ const AdminDashboard: React.FC = () => {
                             </div>
                         )}
                     </div>
+                </div>
+
+                {/* COMPLETED DELIVERIES SECTION */}
+                <div className="mt-12 border-t border-gray-200 pt-8">
+                    <div className="flex items-center gap-3 mb-6">
+                        <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                            <Check size={20} className="text-green-600" />
+                        </div>
+                        <div>
+                            <h2 className="text-2xl font-bold text-gray-900">Completed Deliveries</h2>
+                            <p className="text-gray-500 text-sm">Review proof photos and applaud your volunteers</p>
+                        </div>
+                    </div>
+
+                    {completedDeliveries.length === 0 ? (
+                        <div className="p-8 text-center text-gray-500 bg-gray-50 rounded-2xl border border-gray-100">
+                            <p>No completed deliveries yet.</p>
+                        </div>
+                    ) : (
+                        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {completedDeliveries.map(delivery => (
+                                <div key={delivery.id} className="bg-white rounded-[2rem] p-6 shadow-[0_4px_20px_rgb(0,0,0,0.03)] border border-gray-100 hover:border-green-200 transition-all">
+                                    {delivery.deliveryProofUrl && (
+                                        <img src={delivery.deliveryProofUrl} alt="Delivery proof" className="w-full h-40 object-cover rounded-xl mb-4 border border-gray-100" />
+                                    )}
+                                    <h3 className="text-lg font-bold text-gray-900">{delivery.item}</h3>
+                                    <p className="text-green-600 font-medium text-sm">{delivery.quantity}</p>
+                                    <p className="text-xs text-gray-400 mt-1 truncate">Delivered by: {delivery.claimedBy}</p>
+                                    <p className="text-xs text-gray-400 truncate">Address: {delivery.address}</p>
+
+                                    <div className="mt-4">
+                                        {delivery.clappedByAdmin ? (
+                                            <div className="flex items-center justify-center gap-2 bg-yellow-50 border border-yellow-200 py-3 rounded-full">
+                                                <span className="text-xl">👏</span>
+                                                <span className="text-sm font-bold text-yellow-700">Applauded!</span>
+                                            </div>
+                                        ) : (
+                                            <button
+                                                onClick={() => clapForDelivery(delivery.id)}
+                                                className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-yellow-400 to-orange-400 text-white font-bold py-3 rounded-full hover:from-yellow-500 hover:to-orange-500 transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5"
+                                            >
+                                                <span className="text-xl">👏</span> Clap for Volunteer
+                                            </button>
+                                        )}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
                 </div>
 
             </div>
