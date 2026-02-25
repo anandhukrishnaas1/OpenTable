@@ -23,7 +23,7 @@ const AdminDashboard: React.FC = () => {
     const approvedCount = applications.filter(a => a.status === 'Verified').length;
 
     const displayedApps = applications.filter(a =>
-        activeTab === 'pending' ? a.status !== 'Verified' : a.status === 'Verified'
+        activeTab === 'pending' ? a.status !== 'Verified' && a.status !== 'Rejected' : a.status === 'Verified'
     );
 
     return (
