@@ -6,7 +6,7 @@ import { Shield, Check, X, Flag, User, AlertTriangle } from 'lucide-react';
 const AdminDashboard: React.FC = () => {
     const { applications, updateApplicationStatus } = useAdmin();
     const [selectedAppId, setSelectedAppId] = useState<string | null>(null);
-    const [activeTab, setActiveTab] = useState<'pending' | 'approved'>('pending');
+    const [activeTab, setActiveTab] = useState<'pending' | 'approved' | 'rejected'>('pending');
 
     const selectedApp = applications.find(app => app.id === selectedAppId);
 
@@ -19,12 +19,15 @@ const AdminDashboard: React.FC = () => {
         }
     };
 
-    const pendingCount = applications.filter(a => a.status === 'Pending').length;
+    const pendingCount = applications.filter(a => a.status === 'Pending' || a.status === 'Flagged').length;
     const approvedCount = applications.filter(a => a.status === 'Verified').length;
+    const rejectedCount = applications.filter(a => a.status === 'Rejected').length;
 
-    const displayedApps = applications.filter(a =>
-        activeTab === 'pending' ? a.status !== 'Verified' && a.status !== 'Rejected' : a.status === 'Verified'
-    );
+    const displayedApps = applications.filter(a => {
+        if (activeTab === 'pending') return a.status === 'Pending' || a.status === 'Flagged';
+        if (activeTab === 'approved') return a.status === 'Verified';
+        return a.status === 'Rejected';
+    });
 
     return (
         <Layout>
@@ -53,6 +56,12 @@ const AdminDashboard: React.FC = () => {
                                 className={`flex-1 py-2.5 text-sm font-bold rounded-full transition-colors ${activeTab === 'approved' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
                             >
                                 Approved <span className="ml-1 bg-green-500 text-white text-[10px] px-2 py-0.5 rounded-full">{approvedCount}</span>
+                            </button>
+                            <button
+                                onClick={() => setActiveTab('rejected')}
+                                className={`flex-1 py-2.5 text-sm font-bold rounded-full transition-colors ${activeTab === 'rejected' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                            >
+                                Rejected <span className="ml-1 bg-red-500 text-white text-[10px] px-2 py-0.5 rounded-full">{rejectedCount}</span>
                             </button>
                         </div>
 

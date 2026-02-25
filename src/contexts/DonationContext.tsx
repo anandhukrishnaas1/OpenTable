@@ -52,15 +52,14 @@ export const DonationProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
   const addDonation = async (item: DonationItem) => {
     try {
-      // Use the pre-generated ID or a new one
       const donationRef = doc(db, 'donations', item.id || Math.random().toString(36).substr(2, 9));
-      // Convert Date object to string or Timestamp if needed, but setDoc handles JS Dates gracefully sometimes. Just in case:
       await setDoc(donationRef, {
         ...item,
         timestamp: item.timestamp instanceof Date ? item.timestamp.toISOString() : item.timestamp
       });
     } catch (error) {
       console.error("Error adding donation:", error);
+      throw error;
     }
   };
 

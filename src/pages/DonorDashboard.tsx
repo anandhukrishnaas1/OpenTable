@@ -22,6 +22,24 @@ const DonorDashboard: React.FC = () => {
   const [contactPhone, setContactPhone] = useState('');
   const [address, setAddress] = useState('');
   const [isLocating, setIsLocating] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Compress image to fit Firestore 1MB document limit
+  const compressImage = (dataUrl: string, maxWidth = 400, quality = 0.5): Promise<string> => {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const ratio = Math.min(maxWidth / img.width, maxWidth / img.height);
+        canvas.width = img.width * ratio;
+        canvas.height = img.height * ratio;
+        const ctx = canvas.getContext('2d')!;
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        resolve(canvas.toDataURL('image/jpeg', quality));
+      };
+      img.src = dataUrl;
+    });
+  };
 
   // --- CAMERA LOGIC (Same as before) ---
   const startCamera = async () => {
@@ -90,41 +108,53 @@ const DonorDashboard: React.FC = () => {
     }
   };
 
-  const handleFinalSubmit = () => {
+  const handleFinalSubmit = async () => {
     if (!scanResult || !quantity || !contactPhone || !address) {
       alert("Please fill in all details.");
       return;
     }
 
-    const newDonation: DonationItem = {
-      id: Math.random().toString(36).substr(2, 9),
-      item: scanResult.item,
-      category: scanResult.category,
-      quantity: quantity,
-      donorType: donorType,
-      phone: contactPhone,
-      address: address,
-      status: 'active', // <--- STARTS AS ACTIVE
-      timestamp: new Date(),
-      imageUrl: image || undefined
-    };
+    setIsSubmitting(true);
+    try {
+      // Compress the image so it fits in Firestore's 1MB document limit
+      let compressedImage: string | undefined = undefined;
+      if (image) {
+        compressedImage = await compressImage(image);
+      }
 
-    addDonation(newDonation); // <--- SEND TO SHARED CONTEXT
+      const newDonation: DonationItem = {
+        id: Math.random().toString(36).substr(2, 9),
+        item: scanResult.item,
+        category: scanResult.category,
+        quantity: quantity,
+        donorType: donorType,
+        phone: contactPhone,
+        address: address,
+        status: 'active',
+        timestamp: new Date(),
+        imageUrl: compressedImage
+      };
 
-    // Reset
-    setImage(null);
-    setScanResult(null);
-    setQuantity('');
-    setContactPhone('');
-    setAddress('');
-    setActiveTab('active');
+      await addDonation(newDonation);
+
+      // Reset
+      setImage(null);
+      setScanResult(null);
+      setQuantity('');
+      setContactPhone('');
+      setAddress('');
+      setActiveTab('active');
+    } catch (error: any) {
+      alert("Failed to save donation: " + error.message);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  // --- FILTERING ---
   // Active = Status is 'active'
   const activeDonations = donations.filter(d => d.status === 'active');
-  // History = Status is 'claimed' (Volunteer picked it up)
-  const historyDonations = donations.filter(d => d.status === 'claimed');
+  // History = Volunteer picked it up (claimed) or delivered
+  const historyDonations = donations.filter(d => d.status === 'claimed' || d.status === 'delivered');
 
   return (
     <Layout>
@@ -227,7 +257,7 @@ const DonorDashboard: React.FC = () => {
                     </div>
 
                     <div className="pt-4">
-                      <button onClick={handleFinalSubmit} className="w-full bg-gray-900 hover:bg-black text-white font-bold py-4 rounded-full shadow-lg transition-transform hover:-translate-y-0.5">Confirm Donation</button>
+                      <button onClick={handleFinalSubmit} disabled={isSubmitting} className="w-full bg-gray-900 hover:bg-black text-white font-bold py-4 rounded-full shadow-lg transition-transform hover:-translate-y-0.5 disabled:bg-gray-400 disabled:cursor-not-allowed">{isSubmitting ? 'Saving...' : 'Confirm Donation'}</button>
                     </div>
                   </div>
                 )}
