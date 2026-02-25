@@ -32,8 +32,8 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     const [applications, setApplications] = useState<VolunteerApplication[]>([]);
 
     useEffect(() => {
-        console.log("AdminContext: Setting up Firestore listener on 'applications' collection...");
-        const q = collection(db, 'applications');
+        console.log("AdminContext: Setting up Firestore listener on 'volunteersrequest' collection...");
+        const q = collection(db, 'volunteersrequest');
         const unsubscribe = onSnapshot(q, (snapshot) => {
             const apps: VolunteerApplication[] = [];
             snapshot.forEach((docSnap) => {
@@ -57,7 +57,7 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     const submitApplication = async (appData: Omit<VolunteerApplication, 'id' | 'status' | 'trustScore' | 'submittedAt'>) => {
         try {
             const newId = Math.random().toString(36).substr(2, 9);
-            const appRef = doc(db, 'applications', newId);
+            const appRef = doc(db, 'volunteersrequest', newId);
             const payload = {
                 ...appData,
                 status: 'Pending',
@@ -75,7 +75,7 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
     const updateApplicationStatus = async (id: string, status: ApplicationStatus, score?: number) => {
         try {
-            const appRef = doc(db, 'applications', id);
+            const appRef = doc(db, 'volunteersrequest', id);
             const updatePayload: any = { status };
             if (score !== undefined) {
                 updatePayload.trustScore = score;
