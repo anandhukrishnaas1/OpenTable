@@ -74,7 +74,7 @@ const AdminDashboard: React.FC = () => {
                                             {getStatusBadge(app.status)}
                                         </div>
                                         <p className="text-sm text-gray-500 truncate font-medium">{app.email}</p>
-                                        <p className="text-xs text-gray-400 mt-3 font-bold uppercase tracking-wider">{app.submittedAt.toLocaleDateString()}</p>
+                                        <p className="text-xs text-gray-400 mt-3 font-bold uppercase tracking-wider">{new Date(app.submittedAt).toLocaleDateString()}</p>
                                     </button>
                                 ))
                             )}

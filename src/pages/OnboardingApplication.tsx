@@ -2,15 +2,17 @@ import React, { useState, useRef } from 'react';
 import { Camera, Upload, CheckCircle, ShieldAlert } from 'lucide-react';
 import { Layout } from '../components/Layout';
 import { useAdmin } from '../contexts/AdminContext';
+import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 
 const OnboardingApplication: React.FC = () => {
     const { submitApplication } = useAdmin();
+    const { user } = useAuth();
     const navigate = useNavigate();
 
     const [step, setStep] = useState(1);
     const [name, setName] = useState('');
-    const [email, setEmail] = useState('');
+    const [email, setEmail] = useState(user?.email || '');
 
     const [idImage, setIdImage] = useState<string | null>(null);
     const [selfieImage, setSelfieImage] = useState<string | null>(null);
@@ -88,8 +90,8 @@ const OnboardingApplication: React.FC = () => {
                                 <input value={name} onChange={e => setName(e.target.value)} className="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500" placeholder="John Doe" required />
                             </div>
                             <div>
-                                <label className="block text-sm font-bold text-gray-700 mb-2">Email Address</label>
-                                <input value={email} onChange={e => setEmail(e.target.value)} type="email" className="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500" placeholder="john@example.com" />
+                                <label className="block text-sm font-bold text-gray-700 mb-2">Email Address (Locked to account)</label>
+                                <input value={email} disabled className="w-full p-4 bg-gray-100 text-gray-500 border border-gray-200 rounded-xl cursor-not-allowed" />
                             </div>
                             <div>
                                 <label className="block text-sm font-bold text-gray-700 mb-2">Organization Affiliation (Optional)</label>
