@@ -6,6 +6,7 @@ import { doc, getDoc } from 'firebase/firestore';
 interface AuthContextType {
   user: User | null;
   isAdmin: boolean;
+  isVerifiedVolunteer: boolean;
   loading: boolean;
   signInGoogle: () => Promise<void>;
   signInEmail: (email: string, pass: string) => Promise<void>;
@@ -20,6 +21,7 @@ export const useAuth = () => useContext(AuthContext);
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isVerifiedVolunteer, setIsVerifiedVolunteer] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -28,19 +30,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       if (currentUser) {
         try {
-          // Check if admin in Firestore
+          // Check user role in Firestore
           const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
-          if (userDoc.exists() && userDoc.data().role === 'admin') {
-            setIsAdmin(true);
+          if (userDoc.exists()) {
+            const role = userDoc.data().role;
+            setIsAdmin(role === 'admin');
+            setIsVerifiedVolunteer(role === 'volunteer');
           } else {
             setIsAdmin(false);
+            setIsVerifiedVolunteer(false);
           }
         } catch (e) {
           console.error("Error fetching user role", e);
           setIsAdmin(false);
+          setIsVerifiedVolunteer(false);
         }
       } else {
         setIsAdmin(false);
+        setIsVerifiedVolunteer(false);
       }
 
       setLoading(false);
@@ -65,7 +72,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <AuthContext.Provider value={{ user, isAdmin, loading, signInGoogle, signInEmail, signUpEmail, signOut }}>
+    <AuthContext.Provider value={{ user, isAdmin, isVerifiedVolunteer, loading, signInGoogle, signInEmail, signUpEmail, signOut }}>
       {!loading && children}
     </AuthContext.Provider>
   );

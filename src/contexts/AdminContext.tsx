@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { db } from '../services/firebase';
-import { collection, onSnapshot, doc, setDoc, updateDoc } from 'firebase/firestore';
+import { collection, onSnapshot, doc, setDoc, updateDoc, query, where, getDocs } from 'firebase/firestore';
 
 export type ApplicationStatus = 'Pending' | 'Verified' | 'Flagged' | 'Rejected';
 
@@ -81,6 +81,19 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
                 updatePayload.trustScore = score;
             }
             await updateDoc(appRef, updatePayload);
+
+            // When verified, also update the user's role in the 'users' collection
+            // so they stay verified permanently without needing to re-check
+            if (status === 'Verified') {
+                const app = applications.find(a => a.id === id);
+                if (app?.email) {
+                    const usersQuery = query(collection(db, 'users'), where('email', '==', app.email));
+                    const usersSnap = await getDocs(usersQuery);
+                    usersSnap.forEach(async (userDoc) => {
+                        await updateDoc(doc(db, 'users', userDoc.id), { role: 'volunteer' });
+                    });
+                }
+            }
         } catch (error) {
             console.error("Error updating application status:", error);
         }

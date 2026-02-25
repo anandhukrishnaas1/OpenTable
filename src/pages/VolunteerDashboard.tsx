@@ -11,7 +11,7 @@ import Toast, { useToast } from '../components/Toast';
 
 const VolunteerDashboard: React.FC = () => {
   const { donations, claimDonation, completeDelivery } = useDonations();
-  const { user } = useAuth();
+  const { user, isVerifiedVolunteer } = useAuth();
   const { applications } = useAdmin();
 
   const [activeTab, setActiveTab] = useState<'available' | 'mydeliveries' | 'completed'>('available');
@@ -25,8 +25,8 @@ const VolunteerDashboard: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast, showToast, hideToast } = useToast();
 
-  // If ANY application matches this user's email AND is 'Verified', they are good to go!
-  const isVerified = applications.some(app => app.email === user?.email && app.status === 'Verified');
+  // Check verification: either from user's own role OR from the applications list
+  const isVerified = isVerifiedVolunteer || applications.some(app => app.email === user?.email && app.status === 'Verified');
 
   // Filter only 'active' donations for the volunteer to see
   const availablePickups = donations.filter(d => d.status === 'active');
