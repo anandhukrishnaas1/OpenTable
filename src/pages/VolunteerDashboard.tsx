@@ -7,6 +7,7 @@ import { useAdmin } from '../contexts/AdminContext';
 import { Link } from 'react-router-dom';
 import { Shield } from 'lucide-react';
 import { uploadToCloudinary } from '../services/cloudinary';
+import Toast, { useToast } from '../components/Toast';
 
 const VolunteerDashboard: React.FC = () => {
   const { donations, claimDonation, completeDelivery } = useDonations();
@@ -22,6 +23,7 @@ const VolunteerDashboard: React.FC = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { toast, showToast, hideToast } = useToast();
 
   // If ANY application matches this user's email AND is 'Verified', they are good to go!
   const isVerified = applications.some(app => app.email === user?.email && app.status === 'Verified');
@@ -52,7 +54,7 @@ const VolunteerDashboard: React.FC = () => {
       const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
       if (videoRef.current) videoRef.current.srcObject = stream;
     } catch (err) {
-      alert("Could not access camera.");
+      showToast("Could not access camera.", 'error');
       setIsCameraOpen(false);
     }
   };
@@ -81,9 +83,9 @@ const VolunteerDashboard: React.FC = () => {
         await completeDelivery(selectedDonationId, cloudinaryUrl);
         setSelectedDonationId(null);
         setProofImage(null);
-        alert("Delivery recorded! Thank you for closing the loop.");
+        showToast("Delivery recorded! Thank you for closing the loop.", 'success');
       } catch (error: any) {
-        alert("Failed to upload proof: " + error.message);
+        showToast("Failed to upload proof: " + error.message, 'error');
       } finally {
         setIsSubmitting(false);
       }
@@ -92,6 +94,7 @@ const VolunteerDashboard: React.FC = () => {
 
   return (
     <Layout>
+      <Toast message={toast.message} type={toast.type} isVisible={toast.visible} onClose={hideToast} />
       <div className="max-w-4xl mx-auto px-6 py-10">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Volunteer Dashboard</h1>
@@ -163,7 +166,7 @@ const VolunteerDashboard: React.FC = () => {
                           claimDonation(pickup.id, user.email);
                           setActiveTab('mydeliveries'); // switch tabs automatically
                         } else {
-                          alert("Please log in to claim.");
+                          showToast("Please log in to claim.", 'warning');
                         }
                       }}
                       className="flex-1 bg-green-600 text-white font-bold py-4 rounded-full hover:bg-green-700 transition-colors flex items-center justify-center gap-2 shadow-sm"

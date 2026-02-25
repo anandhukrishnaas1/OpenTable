@@ -5,6 +5,7 @@ import { useAdmin } from '../contexts/AdminContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { uploadToCloudinary } from '../services/cloudinary';
+import Toast, { useToast } from '../components/Toast';
 
 const OnboardingApplication: React.FC = () => {
     const { submitApplication, applications } = useAdmin();
@@ -13,6 +14,8 @@ const OnboardingApplication: React.FC = () => {
 
     // Check if user already submitted
     const existingApplication = applications.find(app => app.email === user?.email);
+
+    const { toast, showToast, hideToast } = useToast();
 
     const [step, setStep] = useState(1);
     const [name, setName] = useState('');
@@ -43,7 +46,7 @@ const OnboardingApplication: React.FC = () => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!idImage || !selfieImage || !termsSigned || digitalSignature.toLowerCase() !== name.toLowerCase()) {
-            alert("Please complete all required fields and sign your full name exactly.");
+            showToast("Please complete all required fields and sign your full name exactly.", 'warning');
             return;
         }
 
@@ -71,7 +74,7 @@ const OnboardingApplication: React.FC = () => {
 
             setStep(4); // Success screen
         } catch (error: any) {
-            alert("Failed to submit application: " + error.message);
+            showToast("Failed to submit application: " + error.message, 'error');
         } finally {
             setIsSubmitting(false);
         }
@@ -79,6 +82,7 @@ const OnboardingApplication: React.FC = () => {
 
     return (
         <Layout>
+            <Toast message={toast.message} type={toast.type} isVisible={toast.visible} onClose={hideToast} />
             <div className="max-w-2xl mx-auto px-4 py-8">
                 <div className="mb-8">
                     <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-green-600 to-blue-600 mb-2">
@@ -161,7 +165,7 @@ const OnboardingApplication: React.FC = () => {
                                             placeholder="Please declare any relevant history (e.g. food handling certifications, past infractions). Write 'None' if NA."
                                         />
                                     </div>
-                                    <button onClick={() => { if (name) setStep(2); else alert('Name is required'); }} className="w-full py-4 bg-black text-white rounded-xl font-bold hover:bg-gray-800 transition-colors">
+                                    <button onClick={() => { if (name) setStep(2); else showToast('Name is required', 'warning'); }} className="w-full py-4 bg-black text-white rounded-xl font-bold hover:bg-gray-800 transition-colors">
                                         Continue to Identity Verification
                                     </button>
                                 </div>
@@ -218,7 +222,7 @@ const OnboardingApplication: React.FC = () => {
                                     <div className="flex gap-4">
                                         <button onClick={() => setStep(1)} className="w-1/3 py-4 bg-gray-100 text-gray-700 rounded-xl font-bold hover:bg-gray-200 transition-colors">Back</button>
                                         <button
-                                            onClick={() => { if (idImage && selfieImage) setStep(3); else alert('Please upload both files.'); }}
+                                            onClick={() => { if (idImage && selfieImage) setStep(3); else showToast('Please upload both files.', 'warning'); }}
                                             className="w-2/3 py-4 bg-black text-white rounded-xl font-bold hover:bg-gray-800 transition-colors"
                                         >
                                             Continue to Terms

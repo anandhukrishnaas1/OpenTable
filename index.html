@@ -20,12 +20,22 @@
             'float-medium': 'float 15s ease-in-out infinite reverse',
             'float-fast': 'float 10s ease-in-out infinite alternate',
             'spin-slow': 'spin 30s linear infinite',
+            'slide-down': 'slideDown 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+            'shrink-bar': 'shrinkBar linear forwards',
           },
           keyframes: {
             float: {
               '0%, 100%': { transform: 'translateY(0px) rotate(0deg)' },
               '50%': { transform: 'translateY(-30px) rotate(15deg)' },
-            }
+            },
+            slideDown: {
+              '0%': { opacity: '0', transform: 'translate(-50%, -100%)' },
+              '100%': { opacity: '1', transform: 'translate(-50%, 0)' },
+            },
+            shrinkBar: {
+              '0%': { width: '100%' },
+              '100%': { width: '0%' },
+            },
           },
           colors: {
             orange: {

@@ -4,10 +4,12 @@ import { Layout } from '../components/Layout';
 import { analyzeFoodImage, ScanResult } from '../services/geminiService';
 import { useDonations, DonationItem } from '../contexts/DonationContext';
 import { uploadToCloudinary } from '../services/cloudinary';
+import Toast, { useToast } from '../components/Toast';
 
 const DonorDashboard: React.FC = () => {
   const { donations, addDonation } = useDonations(); // <--- USE CONTEXT
   const [activeTab, setActiveTab] = useState<'scan' | 'active' | 'history'>('scan');
+  const { toast, showToast, hideToast } = useToast();
 
   // Camera & Form States
   const [image, setImage] = useState<string | null>(null);
@@ -33,7 +35,7 @@ const DonorDashboard: React.FC = () => {
       const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
       if (videoRef.current) videoRef.current.srcObject = stream;
     } catch (err) {
-      alert("Could not access camera.");
+      showToast("Could not access camera.", 'error');
       setIsCameraOpen(false);
     }
   };
@@ -73,7 +75,7 @@ const DonorDashboard: React.FC = () => {
       const result = await analyzeFoodImage(imageBase64);
       setScanResult(result);
     } catch (error: any) {
-      alert("Analysis failed: " + error.message);
+      showToast("Analysis failed: " + error.message, 'error');
     } finally {
       setAnalyzing(false);
     }
@@ -87,14 +89,14 @@ const DonorDashboard: React.FC = () => {
           setAddress(`Lat: ${pos.coords.latitude.toFixed(4)}, Long: ${pos.coords.longitude.toFixed(4)}`);
           setIsLocating(false);
         },
-        () => { alert("Location failed"); setIsLocating(false); }
+        () => { showToast("Location failed", 'error'); setIsLocating(false); }
       );
     }
   };
 
   const handleFinalSubmit = async () => {
     if (!scanResult || !quantity || !contactPhone || !address) {
-      alert("Please fill in all details.");
+      showToast("Please fill in all details.", 'warning');
       return;
     }
 
@@ -132,7 +134,7 @@ const DonorDashboard: React.FC = () => {
       setAddress('');
       setActiveTab('active');
     } catch (error: any) {
-      alert("Failed to save donation: " + error.message);
+      showToast("Failed to save donation: " + error.message, 'error');
     } finally {
       setIsSubmitting(false);
     }
@@ -145,6 +147,7 @@ const DonorDashboard: React.FC = () => {
 
   return (
     <Layout>
+      <Toast message={toast.message} type={toast.type} isVisible={toast.visible} onClose={hideToast} />
       <div className="max-w-3xl mx-auto px-4 py-8">
         {/* TABS */}
         <div className="bg-gray-100/80 rounded-full p-1.5 mb-10 flex shadow-sm border border-gray-100">
