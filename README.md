@@ -40,7 +40,7 @@
 
 ## 🎯 Problem Statement
 
-**1.3 billion tons** of food is wasted globally every year, while **828 million people** go hungry. A massive portion of edible food from restaurants, caterers, and households is thrown away simply because there is no efficient system to redistribute it in time.
+**1.3 billion tons** of food is wasted globally every year, while **827 million people** go hungry. A massive portion of edible food from restaurants, caterers, and households is thrown away simply because there is no efficient system to redistribute it in time.
 
 ### The Gap
 
