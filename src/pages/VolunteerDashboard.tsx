@@ -144,7 +144,7 @@ const VolunteerDashboard: React.FC = () => {
         </div>
 
         {/* TABS */}
-        <div className="bg-gray-100/80 rounded-full p-1.5 mb-10 flex shadow-sm border border-gray-100 max-w-sm">
+        <div className="bg-gray-100/80 rounded-full p-1.5 mb-10 flex shadow-sm border border-gray-100 max-w-2xl">
           <button
             onClick={() => setActiveTab('available')}
             className={`flex-1 py-3 px-6 rounded-full text-sm font-bold transition-all ${activeTab === 'available' ? 'bg-white text-green-700 shadow-sm' : 'text-gray-500 hover:text-gray-900'

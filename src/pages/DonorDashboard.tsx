@@ -4,10 +4,12 @@ import { Layout } from '../components/Layout';
 import { analyzeFoodImage, ScanResult } from '../services/geminiService';
 import { useDonations, DonationItem } from '../contexts/DonationContext';
 import { uploadToCloudinary } from '../services/cloudinary';
+import { useAuth } from '../contexts/AuthContext';
 import Toast, { useToast } from '../components/Toast';
 
 const DonorDashboard: React.FC = () => {
-  const { donations, addDonation } = useDonations(); // <--- USE CONTEXT
+  const { donations, addDonation } = useDonations();
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState<'scan' | 'active' | 'history'>('scan');
   const { toast, showToast, hideToast } = useToast();
 
@@ -122,7 +124,8 @@ const DonorDashboard: React.FC = () => {
         status: 'active',
         timestamp: new Date(),
         imageUrl: imageUrl,
-        expiresIn: scanResult.expiresIn
+        expiresIn: scanResult.expiresIn,
+        donorEmail: user?.email || undefined
       };
 
       await addDonation(newDonation);
@@ -141,10 +144,12 @@ const DonorDashboard: React.FC = () => {
     }
   };
 
+  // Only show this donor's donations
+  const myDonations = donations.filter(d => d.donorEmail === user?.email);
   // Active = Status is 'active'
-  const activeDonations = donations.filter(d => d.status === 'active');
+  const activeDonations = myDonations.filter(d => d.status === 'active');
   // History = Volunteer picked it up (claimed) or delivered
-  const historyDonations = donations.filter(d => d.status === 'claimed' || d.status === 'delivered');
+  const historyDonations = myDonations.filter(d => d.status === 'claimed' || d.status === 'delivered');
 
   return (
     <Layout>

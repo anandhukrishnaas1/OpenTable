@@ -17,6 +17,7 @@ export interface DonationItem {
   deliveryProofUrl?: string;
   clappedByAdmin?: boolean;
   expiresIn?: string;
+  donorEmail?: string;
 }
 
 interface DonationContextType {
