@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { Layout } from '../components/Layout';
-import { MapPin, Phone, CheckCircle, Clock, ExternalLink, Camera, Upload, X, Truck, AlertTriangle } from 'lucide-react';
-import { DonationItem } from '../contexts/DonationContext';
+import { MapPin, Phone, CheckCircle, Clock, ExternalLink, Camera, X, Truck, AlertTriangle } from 'lucide-react';
+import type { DonationItem } from '../contexts/DonationContext';
 import { useDonations } from '../contexts/DonationContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useAdmin } from '../contexts/AdminContext';
@@ -96,7 +96,7 @@ const VolunteerDashboard: React.FC = () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
       if (videoRef.current) videoRef.current.srcObject = stream;
-    } catch (err) {
+    } catch {
       showToast("Could not access camera.", 'error');
       setIsCameraOpen(false);
     }
@@ -127,8 +127,9 @@ const VolunteerDashboard: React.FC = () => {
         setSelectedDonationId(null);
         setProofImage(null);
         showToast("Delivery recorded! Thank you for closing the loop.", 'success');
-      } catch (error: any) {
-        showToast("Failed to upload proof: " + error.message, 'error');
+      } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : 'Unknown error';
+        showToast("Failed to upload proof: " + message, 'error');
       } finally {
         setIsSubmitting(false);
       }
@@ -341,9 +342,9 @@ const VolunteerDashboard: React.FC = () => {
                       <div className="absolute bottom-4 left-0 right-0 flex justify-center items-center gap-8">
                         <button onClick={() => setIsCameraOpen(false)} className="bg-white/20 backdrop-blur-md p-3 rounded-full text-white"><X size={20} /></button>
                         <button onClick={capturePhoto} className="bg-white p-1 rounded-full border-4 border-gray-200">
-                          <div className="w-12 h-12 bg-white border-4 border-black rounded-full"></div>
+                          <div className="w-12 h-12 bg-white border-4 border-black rounded-full" />
                         </button>
-                        <div className="w-12"></div>
+                        <div className="w-12" />
                       </div>
                     </div>
                   )}

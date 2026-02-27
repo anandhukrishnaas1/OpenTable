@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Layout } from '../components/Layout';
-import { useAdmin, VolunteerApplication, ApplicationStatus } from '../contexts/AdminContext';
+import type { ApplicationStatus } from '../contexts/AdminContext';
+import { useAdmin } from '../contexts/AdminContext';
 import { useDonations } from '../contexts/DonationContext';
 import { Shield, Check, X, Flag, User, AlertTriangle } from 'lucide-react';
 

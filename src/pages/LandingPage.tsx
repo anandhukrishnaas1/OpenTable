@@ -23,15 +23,15 @@ const LandingPage: React.FC = () => {
       setCurrentImageIndex((prev) => (prev + 1) % sliderImages.length);
     }, 3000);
     return () => clearInterval(interval);
-  }, []);
+  }, [sliderImages.length]);
 
   return (
     <Layout>
       {/* --- HERO SECTION --- */}
       <div className="bg-warm-gradient relative overflow-hidden pb-12">
         {/* Decorative soft circles */}
-        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-green-100/50 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3"></div>
-        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-orange-50/60 rounded-full blur-3xl translate-y-1/3 -translate-x-1/4"></div>
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-green-100/50 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3" />
+        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-orange-50/60 rounded-full blur-3xl translate-y-1/3 -translate-x-1/4" />
 
         <div className="max-w-6xl mx-auto px-6 py-20 md:py-32 grid md:grid-cols-2 gap-12 items-center relative z-10">
           <div className="space-y-6 animate-in slide-in-from-left duration-700">
@@ -78,7 +78,7 @@ const LandingPage: React.FC = () => {
       {/* --- CONTENT SECTIONS --- */}
       <div className="bg-gray-50 py-24 relative overflow-hidden">
         {/* Soft floating background element */}
-        <div className="absolute top-1/4 left-0 w-96 h-96 bg-green-50 rounded-full blur-3xl opacity-50 pointer-events-none"></div>
+        <div className="absolute top-1/4 left-0 w-96 h-96 bg-green-50 rounded-full blur-3xl opacity-50 pointer-events-none" />
         <div className="max-w-4xl mx-auto px-6 space-y-20 relative z-10">
 
           {/* 1. Our Purpose */}
@@ -137,7 +137,7 @@ const LandingPage: React.FC = () => {
                 { title: 'Volunteer Network', desc: 'Dedicated volunteers ensure timely delivery' }
               ].map((item, i) => (
                 <li key={i} className="flex gap-3">
-                  <div className="w-2 h-2 rounded-full bg-green-500 mt-2 shrink-0"></div>
+                  <div className="w-2 h-2 rounded-full bg-green-500 mt-2 shrink-0" />
                   <div>
                     <span className="font-bold text-gray-900">{item.title}:</span> <span className="text-gray-600">{item.desc}</span>
                   </div>

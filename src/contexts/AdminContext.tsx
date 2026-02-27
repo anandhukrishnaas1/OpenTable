@@ -32,7 +32,7 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     const [applications, setApplications] = useState<VolunteerApplication[]>([]);
 
     useEffect(() => {
-        console.log("AdminContext: Setting up Firestore listener on 'volunteersrequest' collection...");
+        console.warn("AdminContext: Setting up Firestore listener on 'volunteersrequest' collection...");
         const q = collection(db, 'volunteersrequest');
         const unsubscribe = onSnapshot(q, (snapshot) => {
             const apps: VolunteerApplication[] = [];
@@ -45,7 +45,7 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
                 const timeB = b.submittedAt ? new Date(b.submittedAt).getTime() : 0;
                 return timeB - timeA;
             });
-            console.log("AdminContext: Loaded", apps.length, "applications from Firestore:", apps.map(a => ({ id: a.id, status: a.status, email: a.email })));
+            console.warn("AdminContext: Loaded", apps.length, "applications from Firestore:", apps.map(a => ({ id: a.id, status: a.status, email: a.email })));
             setApplications(apps);
         }, (error) => {
             console.error("AdminContext: Firestore onSnapshot ERROR:", error.code, error.message);
@@ -64,11 +64,12 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
                 trustScore: 0,
                 submittedAt: new Date().toISOString()
             };
-            console.log("Submitting application to Firestore:", newId, payload);
+            console.warn("Submitting application to Firestore:", newId, payload);
             await setDoc(appRef, payload);
-            console.log("Application saved successfully:", newId);
-        } catch (error: any) {
-            console.error("Error submitting application to Firestore:", error.code, error.message);
+            console.warn("Application saved successfully:", newId);
+        } catch (error: unknown) {
+            const message = error instanceof Error ? error.message : 'Unknown error';
+            console.error("Error submitting application to Firestore:", message);
             throw error;
         }
     };
@@ -76,7 +77,7 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     const updateApplicationStatus = async (id: string, status: ApplicationStatus, score?: number) => {
         try {
             const appRef = doc(db, 'volunteersrequest', id);
-            const updatePayload: any = { status };
+            const updatePayload: Record<string, ApplicationStatus | number> = { status };
             if (score !== undefined) {
                 updatePayload.trustScore = score;
             }

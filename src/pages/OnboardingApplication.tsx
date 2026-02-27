@@ -20,7 +20,7 @@ const OnboardingApplication: React.FC = () => {
 
     const [step, setStep] = useState(1);
     const [name, setName] = useState('');
-    const [email, setEmail] = useState(user?.email || '');
+    const email = user?.email || '';
 
     const [idImage, setIdImage] = useState<string | null>(null);
     const [selfieImage, setSelfieImage] = useState<string | null>(null);
@@ -74,8 +74,9 @@ const OnboardingApplication: React.FC = () => {
             });
 
             setStep(4); // Success screen
-        } catch (error: any) {
-            showToast("Failed to submit application: " + error.message, 'error');
+        } catch (error: unknown) {
+            const message = error instanceof Error ? error.message : 'Unknown error';
+            showToast("Failed to submit application: " + message, 'error');
         } finally {
             setIsSubmitting(false);
         }

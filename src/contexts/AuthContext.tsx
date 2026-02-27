@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { User, onAuthStateChanged } from 'firebase/auth';
+import type { User} from 'firebase/auth';
+import { onAuthStateChanged } from 'firebase/auth';
 import { auth, signInWithGoogle, logout, loginWithEmail, registerWithEmail, db } from '../services/firebase';
 import { doc, onSnapshot } from 'firebase/firestore';
 

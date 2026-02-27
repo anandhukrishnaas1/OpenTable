@@ -1,8 +1,10 @@
 import React, { useState, useRef } from 'react';
-import { Camera, Upload, X, CheckCircle, Clock, MapPin, Package, Phone, Navigation, RefreshCw } from 'lucide-react';
+import { Camera, Upload, X, MapPin, Package, RefreshCw } from 'lucide-react';
 import { Layout } from '../components/Layout';
-import { analyzeFoodImage, ScanResult } from '../services/geminiService';
-import { useDonations, DonationItem } from '../contexts/DonationContext';
+import type { ScanResult } from '../services/geminiService';
+import { analyzeFoodImage } from '../services/geminiService';
+import type { DonationItem } from '../contexts/DonationContext';
+import { useDonations } from '../contexts/DonationContext';
 import { uploadToCloudinary } from '../services/cloudinary';
 import { useAuth } from '../contexts/AuthContext';
 import Toast from '../components/Toast';
@@ -37,7 +39,7 @@ const DonorDashboard: React.FC = () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
       if (videoRef.current) videoRef.current.srcObject = stream;
-    } catch (err) {
+    } catch {
       showToast("Could not access camera.", 'error');
       setIsCameraOpen(false);
     }
@@ -77,8 +79,9 @@ const DonorDashboard: React.FC = () => {
     try {
       const result = await analyzeFoodImage(imageBase64);
       setScanResult(result);
-    } catch (error: any) {
-      showToast("Analysis failed: " + error.message, 'error');
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Unknown error';
+      showToast("Analysis failed: " + message, 'error');
     } finally {
       setAnalyzing(false);
     }
@@ -138,8 +141,9 @@ const DonorDashboard: React.FC = () => {
       setContactPhone('');
       setAddress('');
       setActiveTab('active');
-    } catch (error: any) {
-      showToast("Failed to save donation: " + error.message, 'error');
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Unknown error';
+      showToast("Failed to save donation: " + message, 'error');
     } finally {
       setIsSubmitting(false);
     }
@@ -161,7 +165,7 @@ const DonorDashboard: React.FC = () => {
           {['scan', 'active', 'history'].map((tab) => (
             <button
               key={tab}
-              onClick={() => setActiveTab(tab as any)}
+              onClick={() => setActiveTab(tab as 'scan' | 'active' | 'history')}
               className={`flex-1 py-3 px-6 rounded-full text-sm font-bold transition-all capitalize ${activeTab === tab ? 'bg-white text-green-700 shadow-sm' : 'text-gray-500 hover:text-gray-900'
                 }`}
             >
@@ -196,9 +200,9 @@ const DonorDashboard: React.FC = () => {
                 <div className="absolute bottom-6 left-0 right-0 flex justify-center items-center gap-8">
                   <button onClick={() => setIsCameraOpen(false)} className="bg-white/20 backdrop-blur-md p-4 rounded-full text-white"><X size={24} /></button>
                   <button onClick={capturePhoto} className="bg-white p-1 rounded-full border-4 border-gray-200 hover:scale-105 transition-transform">
-                    <div className="w-16 h-16 bg-white border-4 border-black rounded-full"></div>
+                    <div className="w-16 h-16 bg-white border-4 border-black rounded-full" />
                   </button>
-                  <div className="w-14"></div>
+                  <div className="w-14" />
                 </div>
               </div>
             )}
@@ -211,7 +215,7 @@ const DonorDashboard: React.FC = () => {
                   <button onClick={() => { setImage(null); setScanResult(null); }} className="absolute top-4 right-4 bg-white/90 p-2 rounded-full text-gray-600 hover:text-red-600"><RefreshCw size={20} /></button>
                   {analyzing && (
                     <div className="absolute inset-0 bg-black/50 flex items-center justify-center text-white font-bold backdrop-blur-sm">
-                      <div className="flex flex-col items-center gap-3"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>Analyzing...</div>
+                      <div className="flex flex-col items-center gap-3"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white" />Analyzing...</div>
                     </div>
                   )}
                 </div>

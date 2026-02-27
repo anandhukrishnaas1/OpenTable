@@ -88,7 +88,7 @@ const TransparencyLedger: React.FC = () => {
 
                 {/* Header Section */}
                 <div className="text-center mb-16 relative">
-                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-green-100/50 rounded-full blur-3xl -z-10"></div>
+                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-green-100/50 rounded-full blur-3xl -z-10" />
                     <div className="inline-flex items-center gap-2 bg-green-100 text-green-700 px-4 py-2 rounded-full font-bold text-sm mb-6 shadow-sm">
                         <TrendingUp size={16} /> Live Impact Dashboard
                     </div>

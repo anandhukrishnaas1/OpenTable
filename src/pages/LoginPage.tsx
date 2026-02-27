@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { Layout } from '../components/Layout';
-import { Leaf, Mail, Lock, Phone, User as UserIcon, Loader } from 'lucide-react';
+import { Mail, Lock, Phone, User as UserIcon, Loader } from 'lucide-react';
 
 const LoginPage: React.FC = () => {
   const { signInGoogle, signInEmail, signUpEmail, user } = useAuth();
@@ -34,8 +34,9 @@ const LoginPage: React.FC = () => {
         await signInEmail(email, password);
       }
       navigate('/role-selection');
-    } catch (err: any) {
-      setError(err.message.replace('Firebase: ', ''));
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Unknown error';
+      setError(message.replace('Firebase: ', ''));
     } finally {
       setLoading(false);
     }
@@ -47,9 +48,10 @@ const LoginPage: React.FC = () => {
       setLoading(true);
       await signInGoogle();
       navigate('/role-selection');
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err);
-      setError("Google Login Error: " + err.message.replace('Firebase: ', ''));
+      const message = err instanceof Error ? err.message : 'Unknown error';
+      setError("Google Login Error: " + message.replace('Firebase: ', ''));
     } finally {
       setLoading(false);
     }
@@ -141,7 +143,7 @@ const LoginPage: React.FC = () => {
           </form>
 
           <div className="relative my-8">
-            <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-gray-200"></div></div>
+            <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-gray-200" /></div>
             <div className="relative flex justify-center text-sm"><span className="px-4 bg-white text-gray-500">Or continue with</span></div>
           </div>
 

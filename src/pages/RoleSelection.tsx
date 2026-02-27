@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Layout } from '../components/Layout';
-import { Heart, Truck, Leaf, Shield } from 'lucide-react';
+import { Heart, Truck, Shield } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 
 const RoleSelection: React.FC = () => {
@@ -66,7 +66,7 @@ const RoleSelection: React.FC = () => {
               onClick={() => navigate('/admin')}
               className="group bg-white p-8 rounded-3xl shadow-lg border-2 border-green-500 ring-4 ring-green-50 hover:shadow-xl transition-all flex flex-col items-center gap-6 text-center cursor-pointer relative overflow-hidden"
             >
-              <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-green-500 to-blue-500"></div>
+              <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-green-500 to-blue-500" />
               <div className="bg-gray-100 p-6 rounded-full text-gray-800 group-hover:bg-gray-800 group-hover:text-white transition-colors">
                 <Shield size={48} />
               </div>

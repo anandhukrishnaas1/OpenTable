@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { LogOut, Leaf, ChevronDown, ArrowLeft } from 'lucide-react';
+import { ChevronDown, ArrowLeft } from 'lucide-react';
 import { DoodleBackground } from './DoodleBackground';
 
 export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
