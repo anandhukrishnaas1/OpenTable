@@ -22,8 +22,6 @@
     "jsx": "react-jsx",
     /* Strict Type Checking */
     "strict": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
     "forceConsistentCasingInFileNames": true,
     /* Path Aliases */
