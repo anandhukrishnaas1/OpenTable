@@ -168,36 +168,69 @@ graph TB
 
 ```
 OpenTable/
-├── public/                     # Static assets (logo, carousel images)
+├── .github/                     # GitHub templates
+│   ├── ISSUE_TEMPLATE/
+│   │   ├── bug_report.md        # Bug report template
+│   │   └── feature_request.md   # Feature request template
+│   └── PULL_REQUEST_TEMPLATE.md # PR checklist template
+├── public/                      # Static assets (logo, carousel images)
 ├── src/
-│   ├── components/             # Reusable UI components
-│   │   ├── Layout.tsx          # App shell with navigation & footer
-│   │   └── Toast.tsx           # Custom toast notification system
-│   ├── contexts/               # React Context providers
+│   ├── components/              # Reusable UI components
+│   │   ├── DoodleBackground.tsx # Decorative background component
+│   │   ├── ErrorBoundary.tsx    # Global error boundary with retry
+│   │   ├── Layout.tsx           # App shell with navigation & footer
+│   │   └── Toast.tsx            # Custom toast notification system
+│   ├── config/                  # Application configuration
+│   │   ├── env.ts               # Environment variable validation
+│   │   └── index.ts             # Config barrel exports
+│   ├── constants/               # App-wide constants & enums
+│   │   └── index.ts             # Routes, roles, API URLs, collections
+│   ├── contexts/                # React Context providers
+│   │   ├── AdminContext.tsx     # Volunteer applications & admin actions
 │   │   ├── AuthContext.tsx      # Authentication state & role management
-│   │   ├── DonationContext.tsx  # Donation CRUD & real-time sync
-│   │   └── AdminContext.tsx     # Volunteer applications & admin actions
-│   ├── pages/                  # Route-level page components
-│   │   ├── LandingPage.tsx     # Hero, features, animated landing
-│   │   ├── LoginPage.tsx       # Auth (Google + Email/Password)
-│   │   ├── RoleSelection.tsx   # Post-login role picker
-│   │   ├── DonorDashboard.tsx  # AI scan, list donations, track
-│   │   ├── VolunteerDashboard.tsx # Browse, claim, deliver, proof
-│   │   ├── AdminDashboard.tsx  # Approve volunteers, view deliveries
+│   │   └── DonationContext.tsx  # Donation CRUD & real-time sync
+│   ├── hooks/                   # Custom React hooks
+│   │   ├── index.ts             # Hook barrel exports
+│   │   ├── useLocalStorage.ts   # Persistent state in localStorage
+│   │   ├── useMediaQuery.ts     # Responsive breakpoint detection
+│   │   └── useToast.ts          # Toast notification management
+│   ├── pages/                   # Route-level page components
+│   │   ├── AdminDashboard.tsx   # Approve volunteers, view deliveries
+│   │   ├── DashboardSelection.tsx # Dashboard type selector
+│   │   ├── DonorDashboard.tsx   # AI scan, list donations, track
+│   │   ├── LandingPage.tsx      # Hero, features, animated landing
+│   │   ├── LoginPage.tsx        # Auth (Google + Email/Password)
 │   │   ├── OnboardingApplication.tsx # Volunteer identity verification
-│   │   └── TransparencyLedger.tsx    # Public donation activity log
-│   ├── services/               # External service integrations
-│   │   ├── firebase.ts         # Firebase initialization & helpers
-│   │   ├── geminiService.ts    # Google Gemini AI integration
-│   │   └── cloudinary.ts       # Cloudinary image upload service
-│   ├── App.tsx                 # Route definitions with lazy loading
-│   ├── index.tsx               # React DOM entry point
-│   └── types.ts                # Shared TypeScript type definitions
-├── firestore.rules             # Firebase security rules
-├── vercel.json                 # Deployment config with caching headers
-├── vite.config.ts              # Vite build configuration
-├── tsconfig.json               # TypeScript configuration
-└── package.json                # Dependencies & scripts
+│   │   ├── RoleSelection.tsx    # Post-login role picker
+│   │   ├── TransparencyLedger.tsx    # Public donation activity log
+│   │   └── VolunteerDashboard.tsx    # Browse, claim, deliver, proof
+│   ├── services/                # External service integrations
+│   │   ├── cloudinary.ts        # Cloudinary image upload service
+│   │   ├── firebase.ts          # Firebase initialization & helpers
+│   │   └── geminiService.ts     # Google Gemini AI integration
+│   ├── utils/                   # Shared utility functions
+│   │   ├── cn.ts                # CSS class name combiner
+│   │   ├── date.ts              # Date formatting & relative time
+│   │   ├── image.ts             # Image processing & compression
+│   │   └── index.ts             # Utility barrel exports
+│   ├── App.tsx                  # Route definitions with lazy loading
+│   ├── index.tsx                # React DOM entry point
+│   └── types.ts                 # Shared TypeScript type definitions
+├── .editorconfig                # Editor formatting standards
+├── .env.example                 # Environment variable template
+├── .eslintrc.js                 # ESLint configuration
+├── .gitignore                   # Git ignore rules
+├── .prettierrc                  # Prettier code formatting config
+├── CHANGELOG.md                 # Version history (Keep a Changelog)
+├── CODE_OF_CONDUCT.md           # Contributor Covenant CoC
+├── CONTRIBUTING.md              # Contribution guidelines
+├── LICENSE                      # MIT License
+├── SECURITY.md                  # Security policy & reporting
+├── firestore.rules              # Firebase security rules
+├── package.json                 # Dependencies & scripts
+├── tsconfig.json                # TypeScript configuration (strict)
+├── vercel.json                  # Deployment config with caching
+└── vite.config.ts               # Vite build configuration
 ```
 
 ---
@@ -371,6 +404,70 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines on code style, co
 ## 📄 License
 
 This project is licensed under the **MIT License** — see the [LICENSE](LICENSE) file for details.
+
+---
+
+## 🚀 Deployment
+
+### Deploy to Vercel (Recommended)
+
+1. Push your code to GitHub
+2. Go to [vercel.com](https://vercel.com) and import your repository
+3. Set the environment variables in the Vercel dashboard:
+   - `VITE_FIREBASE_API_KEY`
+   - `VITE_OPENROUTER_API_KEY`
+   - `VITE_CLOUDINARY_CLOUD_NAME`
+   - `VITE_CLOUDINARY_UPLOAD_PRESET`
+4. Deploy — Vercel auto-detects Vite and configures the build
+
+### Manual Deployment
+
+```bash
+# Build for production
+npm run build
+
+# Preview locally
+npm run preview
+```
+
+The `dist/` folder can be deployed to any static hosting provider (Netlify, AWS S3, Firebase Hosting, etc.).
+
+---
+
+## ❓ FAQ
+
+<details>
+<summary><strong>Q: How do I get a Gemini AI API key?</strong></summary>
+
+Sign up at [OpenRouter](https://openrouter.ai/) and generate an API key. OpenTable uses the `google/gemini-2.5-flash` model via OpenRouter's unified API.
+</details>
+
+<details>
+<summary><strong>Q: Can I run this without AI features?</strong></summary>
+
+Yes — the app works without the AI key, but the food scanning feature will be disabled. All other features (listing, claiming, delivery) work independently.
+</details>
+
+<details>
+<summary><strong>Q: How do I become an admin?</strong></summary>
+
+Manually set the `role` field to `"admin"` in the user's Firestore document under the `users` collection.
+</details>
+
+<details>
+<summary><strong>Q: Is this project PWA-compatible?</strong></summary>
+
+Yes! OpenTable is configured as a Progressive Web App via `vite-plugin-pwa`. Users can install it on mobile and desktop for an app-like experience.
+</details>
+
+<details>
+<summary><strong>Q: How do I configure Firebase?</strong></summary>
+
+1. Create a Firebase project at [console.firebase.google.com](https://console.firebase.google.com/)
+2. Enable **Authentication** (Google + Email/Password providers)
+3. Create a **Firestore** database
+4. Copy the API key and add it to your `.env` file
+</details>
 
 ---
 
