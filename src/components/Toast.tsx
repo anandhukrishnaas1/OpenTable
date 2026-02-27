@@ -1,16 +1,48 @@
+/**
+ * Toast notification component for OpenTable.
+ *
+ * Displays dismissible notification messages with type-specific
+ * styling (success, error, warning, info) and auto-dismiss timer.
+ *
+ * @module components/Toast
+ */
+
 import React, { useEffect } from 'react';
 import { CheckCircle, XCircle, AlertTriangle, Info, X } from 'lucide-react';
 
+/** Toast notification type variants */
 export type ToastType = 'success' | 'error' | 'warning' | 'info';
 
+/** Props for the Toast component */
 interface ToastProps {
+    /** The message to display */
     message: string;
+    /** Visual variant of the toast */
     type: ToastType;
+    /** Whether the toast is currently visible */
     isVisible: boolean;
+    /** Callback fired when the toast is dismissed */
     onClose: () => void;
+    /** Auto-dismiss duration in milliseconds (default: 4000) */
     duration?: number;
 }
 
+/**
+ * Toast notification component.
+ *
+ * Renders a styled notification banner with an icon, message, and close button.
+ * Automatically dismisses after the specified duration.
+ *
+ * @example
+ * ```tsx
+ * <Toast
+ *   message="Donation saved!"
+ *   type="success"
+ *   isVisible={true}
+ *   onClose={() => setVisible(false)}
+ * />
+ * ```
+ */
 const Toast: React.FC<ToastProps> = ({ message, type, isVisible, onClose, duration = 4000 }) => {
     useEffect(() => {
         if (isVisible && duration > 0) {
@@ -67,22 +99,3 @@ const Toast: React.FC<ToastProps> = ({ message, type, isVisible, onClose, durati
 };
 
 export default Toast;
-
-// Hook for easy usage
-export const useToast = () => {
-    const [toast, setToast] = React.useState<{ message: string; type: ToastType; visible: boolean }>({
-        message: '',
-        type: 'info',
-        visible: false,
-    });
-
-    const showToast = (message: string, type: ToastType = 'info') => {
-        setToast({ message, type, visible: true });
-    };
-
-    const hideToast = () => {
-        setToast(prev => ({ ...prev, visible: false }));
-    };
-
-    return { toast, showToast, hideToast };
-};

@@ -8,8 +8,8 @@ interface ToastState {
     visible: boolean;
     /** The message displayed in the toast */
     message: string;
-    /** The toast variant: 'success', 'error', or 'info' */
-    type: 'success' | 'error' | 'info';
+    /** The toast variant: 'success', 'error', 'warning', or 'info' */
+    type: 'success' | 'error' | 'warning' | 'info';
 }
 
 /** Default toast state */

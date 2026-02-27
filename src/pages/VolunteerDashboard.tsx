@@ -8,7 +8,8 @@ import { useAdmin } from '../contexts/AdminContext';
 import { Link } from 'react-router-dom';
 import { Shield } from 'lucide-react';
 import { uploadToCloudinary } from '../services/cloudinary';
-import Toast, { useToast } from '../components/Toast';
+import Toast from '../components/Toast';
+import { useToast } from '../hooks/useToast';
 
 const VolunteerDashboard: React.FC = () => {
   const { donations, claimDonation, completeDelivery } = useDonations();

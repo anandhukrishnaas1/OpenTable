@@ -1,9 +1,19 @@
+/**
+ * Root application component for OpenTable.
+ *
+ * Sets up React Router, Context Providers, Error Boundary,
+ * and lazy-loaded route definitions with code splitting.
+ *
+ * @module App
+ */
+
 import React, { Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import { DonationProvider } from './contexts/DonationContext';
 import { AdminProvider } from './contexts/AdminContext';
 import ErrorBoundary from './components/ErrorBoundary';
+import { ROUTES } from './constants';
 
 /** Lazy-load all pages for code splitting & faster initial load */
 const LandingPage = lazy(() => import('./pages/LandingPage'));
@@ -38,14 +48,14 @@ function App(): React.JSX.Element {
             <Router>
               <Suspense fallback={<PageLoader />}>
                 <Routes>
-                  <Route path="/" element={<LandingPage />} />
-                  <Route path="/login" element={<LoginPage />} />
-                  <Route path="/role-selection" element={<RoleSelection />} />
-                  <Route path="/menu" element={<DonorDashboard />} />
-                  <Route path="/volunteer" element={<VolunteerDashboard />} />
-                  <Route path="/admin" element={<AdminDashboard />} />
-                  <Route path="/onboarding" element={<OnboardingApplication />} />
-                  <Route path="/ledger" element={<TransparencyLedger />} />
+                  <Route path={ROUTES.HOME} element={<LandingPage />} />
+                  <Route path={ROUTES.LOGIN} element={<LoginPage />} />
+                  <Route path={ROUTES.ROLE_SELECTION} element={<RoleSelection />} />
+                  <Route path={ROUTES.DONOR_DASHBOARD} element={<DonorDashboard />} />
+                  <Route path={ROUTES.VOLUNTEER_DASHBOARD} element={<VolunteerDashboard />} />
+                  <Route path={ROUTES.ADMIN_DASHBOARD} element={<AdminDashboard />} />
+                  <Route path={ROUTES.ONBOARDING} element={<OnboardingApplication />} />
+                  <Route path={ROUTES.LEDGER} element={<TransparencyLedger />} />
                 </Routes>
               </Suspense>
             </Router>

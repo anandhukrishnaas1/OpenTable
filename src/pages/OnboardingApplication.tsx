@@ -5,7 +5,8 @@ import { useAdmin } from '../contexts/AdminContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { uploadToCloudinary } from '../services/cloudinary';
-import Toast, { useToast } from '../components/Toast';
+import Toast from '../components/Toast';
+import { useToast } from '../hooks/useToast';
 
 const OnboardingApplication: React.FC = () => {
     const { submitApplication, applications } = useAdmin();

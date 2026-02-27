@@ -1,25 +1,43 @@
-// OpenRouter AI Service for Food Analysis
+/**
+ * OpenRouter AI Service for food image analysis.
+ *
+ * Uses Google Gemini 2.0 Flash via OpenRouter to analyze food images,
+ * detect categories, estimate freshness, and assess safety.
+ *
+ * @module services/geminiService
+ */
 
-const OPENROUTER_API_KEY = import.meta.env.VITE_OPENROUTER_API_KEY;
-const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
+import type { ScanResult } from '../types';
+import { API_URLS, AI_CONFIG } from '../constants';
+import { env } from '../config';
 
-export interface ScanResult {
-  item: string;
-  category: string;
-  expiresIn: string;
-  safeToEat: 'Yes' | 'No';
-  confidence: string;
-}
+/** Re-export ScanResult for backward compatibility */
+export type { ScanResult } from '../types';
 
+/**
+ * Analyzes a food image using Google Gemini AI via OpenRouter.
+ *
+ * Sends the image to the AI model for multi-modal analysis and returns
+ * structured food safety data including item name, category, freshness,
+ * and safety assessment.
+ *
+ * @param {string} imageBase64 - Base64-encoded image string or data URL
+ * @returns {Promise<ScanResult>} Parsed AI analysis result
+ * @throws {Error} If the API request fails or returns no choices
+ *
+ * @example
+ * ```ts
+ * const result = await analyzeFoodImage(base64String);
+ * console.log(result.item);       // "Red Grapes"
+ * console.log(result.safeToEat);  // "Yes"
+ * ```
+ */
 export const analyzeFoodImage = async (imageBase64: string): Promise<ScanResult> => {
   try {
     // Clean the base64 string and build a proper data URL
-    let dataUrl: string;
-    if (imageBase64.startsWith("data:")) {
-      dataUrl = imageBase64;
-    } else {
-      dataUrl = `data:image/jpeg;base64,${imageBase64}`;
-    }
+    const dataUrl = imageBase64.startsWith('data:')
+      ? imageBase64
+      : `data:image/jpeg;base64,${imageBase64}`;
 
     const prompt = `You are a food safety expert. Analyze this food image carefully and return ONLY a valid JSON object with these fields:
 - item: Name of the food (be specific, e.g. "Red Grapes", "Banana Bunch", "Cooked Biryani")
@@ -37,60 +55,59 @@ export const analyzeFoodImage = async (imageBase64: string): Promise<ScanResult>
 
 Return ONLY the JSON object, no markdown, no code fences, no explanation.`;
 
-    const response = await fetch(OPENROUTER_URL, {
-      method: "POST",
+    const response = await fetch(API_URLS.OPENROUTER, {
+      method: 'POST',
       headers: {
-        "Authorization": `Bearer ${OPENROUTER_API_KEY}`,
-        "Content-Type": "application/json",
-        "HTTP-Referer": window.location.origin,
-        "X-Title": "OpenTable"
+        'Authorization': `Bearer ${env.OPENROUTER_API_KEY}`,
+        'Content-Type': 'application/json',
+        'HTTP-Referer': window.location.origin,
+        'X-Title': AI_CONFIG.APP_NAME,
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
+        model: AI_CONFIG.MODEL,
         messages: [
           {
-            role: "user",
+            role: 'user',
             content: [
-              {
-                type: "text",
-                text: prompt
-              },
-              {
-                type: "image_url",
-                image_url: {
-                  url: dataUrl
-                }
-              }
-            ]
-          }
+              { type: 'text', text: prompt },
+              { type: 'image_url', image_url: { url: dataUrl } },
+            ],
+          },
         ],
-        max_tokens: 500
-      })
+        max_tokens: AI_CONFIG.MAX_TOKENS,
+      }),
     });
 
     if (!response.ok) {
       const errorData = await response.text();
-      console.error("OpenRouter API Error:", response.status, errorData);
+      console.error('OpenRouter API Error:', response.status, errorData);
       throw new Error(`API request failed with status ${response.status}: ${errorData}`);
     }
 
     const data = await response.json();
 
     if (!data.choices || data.choices.length === 0) {
-      console.error("OpenRouter returned no choices:", data);
-      throw new Error("No response from AI model");
+      console.error('OpenRouter returned no choices:', data);
+      throw new Error('No response from AI model');
     }
 
-    const text = data.choices[0].message.content;
-    console.log("OpenRouter raw response:", text);
+    const text: string = data.choices[0].message.content;
     return parseAIResponse(text);
-
   } catch (error) {
-    console.error("Food Analysis Error:", error);
+    console.error('Food Analysis Error:', error);
     throw error;
   }
 };
 
+/**
+ * Parses the raw AI text response into a structured ScanResult.
+ *
+ * Handles edge cases like markdown code fences in the response
+ * and returns a safe fallback if parsing fails.
+ *
+ * @param {string} text - Raw text response from the AI model
+ * @returns {ScanResult} Parsed result or fallback values
+ */
 const parseAIResponse = (text: string): ScanResult => {
   try {
     // Remove any markdown code fences if present
@@ -102,15 +119,18 @@ const parseAIResponse = (text: string): ScanResult => {
       cleanedText = jsonMatch[0];
     }
 
-    return JSON.parse(cleanedText);
-  } catch (e) {
-    console.error("Failed to parse AI response:", text);
+    return JSON.parse(cleanedText) as ScanResult;
+  } catch {
+    console.error('Failed to parse AI response:', text);
     return {
-      item: "Unknown Item",
-      category: "Uncategorized",
-      expiresIn: "Unknown",
-      safeToEat: "No",
-      confidence: "0%"
+      id: '',
+      timestamp: Date.now(),
+      imageUrl: '',
+      item: 'Unknown Item',
+      category: 'Produce' as never,
+      expiresIn: 'Unknown',
+      safeToEat: 'No',
+      confidence: '0%',
     };
   }
 };

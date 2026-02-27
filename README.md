@@ -12,6 +12,7 @@
 [![Cloudinary](https://img.shields.io/badge/Cloudinary-Image_CDN-3448C5?style=for-the-badge&logo=cloudinary&logoColor=white)](https://cloudinary.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
 [![Deploy](https://img.shields.io/badge/Vercel-Deployed-000?style=for-the-badge&logo=vercel)](https://opentable-alpha.vercel.app)
+[![CI](https://img.shields.io/github/actions/workflow/status/anandhukrishnaas1/OpenTable/ci.yml?branch=main&style=for-the-badge&label=CI)](https://github.com/anandhukrishnaas1/OpenTable/actions)
 
 [🌐 Live Demo](https://opentable-alpha.vercel.app) · [📝 Report Bug](https://github.com/anandhukrishnaas1/OpenTable/issues) · [✨ Request Feature](https://github.com/anandhukrishnaas1/OpenTable/issues)
 
@@ -21,6 +22,7 @@
 
 ## 📋 Table of Contents
 
+- [Screenshots](#-screenshots)
 - [Problem Statement](#-problem-statement)
 - [Our Solution](#-our-solution)
 - [Key Features](#-key-features)
@@ -29,12 +31,29 @@
 - [Project Structure](#-project-structure)
 - [Getting Started](#-getting-started)
 - [Environment Variables](#-environment-variables)
+- [Testing](#-testing)
 - [User Roles & Flows](#-user-roles--flows)
 - [AI Integration](#-ai-integration)
+- [API Reference](#-api-reference)
 - [Security](#-security)
 - [Performance Optimizations](#-performance-optimizations)
+- [Browser Compatibility](#-browser-compatibility)
+- [Roadmap](#-roadmap)
+- [Troubleshooting](#-troubleshooting)
 - [Contributing](#-contributing)
 - [License](#-license)
+
+---
+
+## 📸 Screenshots
+
+| Landing Page | AI Food Scanner | Volunteer Dashboard |
+|:---:|:---:|:---:|
+| ![Landing](https://opentable-alpha.vercel.app/og-image.png) | AI-powered food analysis with category detection | Browse pickups, claim deliveries, upload proof |
+
+| Donor Dashboard | Admin Panel | Transparency Ledger |
+|:---:|:---:|:---:|
+| Scan food, list donations, track pickups | Approve volunteers, review deliveries | Public accountability log |
 
 ---
 
@@ -294,6 +313,40 @@ VITE_CLOUDINARY_UPLOAD_PRESET=your_upload_preset
 
 ---
 
+## 🧪 Testing
+
+OpenTable uses [Vitest](https://vitest.dev/) for unit and integration testing.
+
+### Run Tests
+
+```bash
+# Run all tests once
+npm run test
+
+# Run tests in watch mode (re-runs on file changes)
+npm run test:watch
+
+# Run tests with coverage report
+npm run test:coverage
+```
+
+### Test Structure
+
+```
+src/__tests__/
+├── setup.ts           # Test environment setup (matchMedia & localStorage mocks)
+└── utils.test.ts      # Unit tests for date, image, and className utilities
+```
+
+### Validation Pipeline
+
+```bash
+# Run all quality checks (typecheck + lint + format + test)
+npm run validate
+```
+
+---
+
 ## 👥 User Roles & Flows
 
 ### Role Hierarchy
@@ -361,7 +414,15 @@ const prompt = `Analyze this food image and provide:
 
 ---
 
-## 🔒 Security
+## � API Reference
+
+For detailed API documentation of all external service integrations, see [docs/API.md](docs/API.md).
+
+For architecture diagrams and design decisions, see [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
+
+---
+
+## �🔒 Security
 
 | Layer | Implementation |
 |-------|---------------|
@@ -384,6 +445,85 @@ const prompt = `Analyze this food image and provide:
 | **Cloudinary CDN** | Images served from nearest edge node |
 | **Vite build** | Tree-shaking, minification, chunk splitting |
 | **Firebase onSnapshot** | Real-time sync without polling |
+
+---
+
+## 🌐 Browser Compatibility
+
+| Browser | Supported | Notes |
+|---------|-----------|-------|
+| Chrome 90+ | ✅ | Recommended |
+| Firefox 90+ | ✅ | Full support |
+| Safari 15+ | ✅ | Full support |
+| Edge 90+ | ✅ | Full support |
+| Mobile Chrome | ✅ | PWA installable |
+| Mobile Safari | ✅ | PWA installable |
+
+---
+
+## 🗺️ Roadmap
+
+- [x] AI-powered food scanning with Gemini
+- [x] Volunteer identity verification system
+- [x] Admin dashboard with clap recognition
+- [x] Real-time donation tracking
+- [x] Progressive Web App (PWA) support
+- [ ] Push notifications for new donations
+- [ ] Geo-based donation matching (nearest volunteer)
+- [ ] Multi-language support (i18n)
+- [ ] Donor impact analytics dashboard
+- [ ] Mobile-native app (React Native)
+
+---
+
+## ❓ Troubleshooting
+
+<details>
+<summary><strong>Build fails with "Missing environment variables"</strong></summary>
+
+Ensure all required variables are set in your `.env` file. Copy from the template:
+```bash
+cp .env.example .env
+```
+Then fill in your API keys. See [Environment Variables](#-environment-variables) for details.
+</details>
+
+<details>
+<summary><strong>Firebase Auth not working</strong></summary>
+
+1. Ensure your Firebase project has **Authentication** enabled
+2. Enable the **Google** and **Email/Password** sign-in providers
+3. Add your domain (`localhost` for development) to the authorized domains list in Firebase Console → Authentication → Settings
+</details>
+
+<details>
+<summary><strong>AI food scanning returns "Unknown Item"</strong></summary>
+
+1. Verify your `VITE_OPENROUTER_API_KEY` is valid
+2. Check that you have sufficient credits on [OpenRouter](https://openrouter.ai/)
+3. Ensure the image is clear and well-lit for best AI results
+</details>
+
+<details>
+<summary><strong>Cloudinary upload fails</strong></summary>
+
+1. Verify `VITE_CLOUDINARY_CLOUD_NAME` matches your Cloudinary account
+2. Ensure the upload preset (`VITE_CLOUDINARY_UPLOAD_PRESET`) exists and is set to **unsigned**
+3. Check your Cloudinary plan's upload limits
+</details>
+
+<details>
+<summary><strong>Tests failing after fresh clone</strong></summary>
+
+```bash
+# Clean install dependencies
+rm -rf node_modules package-lock.json
+npm install
+
+# Run tests
+npm run test
+```
+</details>
 
 ---
 

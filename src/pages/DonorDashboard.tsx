@@ -5,7 +5,8 @@ import { analyzeFoodImage, ScanResult } from '../services/geminiService';
 import { useDonations, DonationItem } from '../contexts/DonationContext';
 import { uploadToCloudinary } from '../services/cloudinary';
 import { useAuth } from '../contexts/AuthContext';
-import Toast, { useToast } from '../components/Toast';
+import Toast from '../components/Toast';
+import { useToast } from '../hooks/useToast';
 
 const DonorDashboard: React.FC = () => {
   const { donations, addDonation } = useDonations();
