@@ -4,31 +4,43 @@ import { Leaf, Users, Star, Truck, Award, TrendingUp } from 'lucide-react';
 import { useDonations } from '../contexts/DonationContext';
 import { useAdmin } from '../contexts/AdminContext';
 
-const parseKg = (qty: string) => {
+/**
+ * Parses a free-text quantity string into an estimated weight in kilograms.
+ * Only extracts numeric values — uses conservative 1kg fallback for unparseable strings.
+ */
+const parseKg = (qty: string): number => {
     if (!qty) return 0;
     const match = qty.match(/(\d+(\.\d+)?)/);
     if (match) {
         const num = parseFloat(match[1]);
         const lower = qty.toLowerCase();
-        if (lower.includes('pound') || lower.includes('lbs')) return num * 0.45;
+        if (lower.includes('gram') || lower.includes('gm') || lower.includes('g')) return num / 1000;
+        if (lower.includes('pound') || lower.includes('lbs') || lower.includes('lb')) return num * 0.45;
         if (lower.includes('ton')) return num * 1000;
-        if (lower.includes('box')) return num * 5; // assume ~5kg per box
-        if (lower.includes('meal')) return num * 0.4; // 1 meal = 0.4kg
-        return num; // fallback assume kg
+        if (lower.includes('box') || lower.includes('boxes')) return num * 3;
+        if (lower.includes('plate') || lower.includes('meal') || lower.includes('serving')) return num * 0.4;
+        if (lower.includes('piece') || lower.includes('pcs') || lower.includes('item')) return num * 0.2;
+        if (lower.includes('kg') || lower.includes('kilo')) return num;
+        return num; // assume kg if no unit specified
     }
-    return 5; // fallback
+    return 1; // conservative fallback: 1kg for unparseable entries
 };
 
 const TransparencyLedger: React.FC = () => {
     const { donations } = useDonations();
     const { applications } = useAdmin();
 
-    const totalDeliveries = donations.filter(d => d.status === 'delivered').length;
+    // Only count delivered donations for impact stats
+    const deliveredDonations = donations.filter(d => d.status === 'delivered');
+    const totalDeliveries = deliveredDonations.length;
 
-    // Aggregations using real data parsing
+    // Kilograms rescued: sum weight from ALL donations (available + claimed + delivered)
     const totalKg = Math.round(donations.reduce((acc, d) => acc + parseKg(d.quantity), 0));
-    const totalMeals = Math.round(totalKg * 2.5); // 1kg = 2.5 meals avg
 
+    // Meals provided: each delivered donation = 1 meal served (real count, not formula)
+    const totalMeals = totalDeliveries;
+
+    // Active volunteers: count verified volunteers from admin applications
     const activeVolunteersCount = applications.filter(a => a.status === 'Verified').length;
 
     // Leaderboards
@@ -103,7 +115,7 @@ const TransparencyLedger: React.FC = () => {
                             <Users size={40} />
                         </div>
                         <div className="text-5xl font-black text-gray-900 mb-2 tracking-tight">{totalMeals.toLocaleString()}</div>
-                        <div className="text-gray-500 font-bold uppercase tracking-wider text-sm">Meals Provided</div>
+                        <div className="text-gray-500 font-bold uppercase tracking-wider text-sm">Deliveries Completed</div>
                     </div>
 
                     <div className="bg-white rounded-[2.5rem] p-10 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100/50 flex flex-col items-center text-center transition-transform hover:-translate-y-1">
