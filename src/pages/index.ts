@@ -7,6 +7,7 @@
 export { default as LandingPage } from './LandingPage';
 export { default as LoginPage } from './LoginPage';
 export { default as RoleSelection } from './RoleSelection';
+export { default as DashboardSelection } from './DashboardSelection';
 export { default as DonorDashboard } from './DonorDashboard';
 export { default as VolunteerDashboard } from './VolunteerDashboard';
 export { default as AdminDashboard } from './AdminDashboard';

@@ -1,3 +1,9 @@
+/**
+ * @module DonorDashboard
+ * @description Main dashboard for food donors. Provides AI-powered food
+ * scanning via camera/upload, donation listing with location and contact
+ * details, and real-time tracking of active and completed donations.
+ */
 import React, { useState, useRef } from 'react';
 import { Camera, Upload, X, MapPin, Package, RefreshCw } from 'lucide-react';
 import { Layout } from '../components/Layout';

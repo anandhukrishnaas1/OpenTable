@@ -1,3 +1,9 @@
+/**
+ * @module AdminDashboard
+ * @description Admin panel for managing volunteer applications and
+ * overseeing completed food deliveries. Provides approve/reject/flag
+ * controls and trust scoring for volunteer verification requests.
+ */
 import React, { useState } from 'react';
 import { Layout } from '../components/Layout';
 import type { ApplicationStatus } from '../contexts/AdminContext';

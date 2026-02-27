@@ -1,3 +1,10 @@
+/**
+ * @module LandingPage
+ * @description Hero landing page with image carousel, animated features
+ * section, and call-to-action buttons. Showcases the platform's key
+ * capabilities: AI food scanning, volunteer verification, real-time
+ * tracking, and transparency ledger.
+ */
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {

@@ -1,3 +1,10 @@
+/**
+ * @module Layout
+ * @description Application shell component wrapping all pages. Provides
+ * responsive navigation header with role-based menu items, user avatar
+ * dropdown, footer with social links, and the DoodleBackground decorative
+ * layer. Handles sign-out and navigation state.
+ */
 import React from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';

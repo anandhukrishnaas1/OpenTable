@@ -1,3 +1,9 @@
+/**
+ * @module OnboardingApplication
+ * @description Multi-step volunteer identity verification form. Collects
+ * government ID photo, live selfie, personal details, and a digital
+ * safe food handling declaration. Submits to Firestore for admin review.
+ */
 import React, { useState, useRef } from 'react';
 import { Camera, Upload, CheckCircle, ShieldAlert } from 'lucide-react';
 import { Layout } from '../components/Layout';

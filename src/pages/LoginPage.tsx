@@ -1,3 +1,10 @@
+/**
+ * @module LoginPage
+ * @description Authentication page supporting Google OAuth and
+ * email/password sign-in/sign-up. Handles form validation, loading
+ * states, and Firebase authentication error display. Redirects
+ * authenticated users to role selection.
+ */
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';

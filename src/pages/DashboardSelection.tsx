@@ -1,3 +1,9 @@
+/**
+ * @module DashboardSelection
+ * @description Post-login dashboard selector allowing users to choose
+ * between the Donor and Volunteer dashboards. Displays a greeting
+ * with the user's first name and role-based navigation cards.
+ */
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Heart, Users } from 'lucide-react';

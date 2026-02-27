@@ -1,3 +1,10 @@
+/**
+ * @module VolunteerDashboard
+ * @description Dashboard for verified volunteers to browse available food
+ * donation pickups, claim deliveries, navigate via Google Maps, and upload
+ * proof-of-delivery photos. Tracks active and completed deliveries with
+ * admin recognition (clap) indicators.
+ */
 import React, { useState, useRef } from 'react';
 import { Layout } from '../components/Layout';
 import {

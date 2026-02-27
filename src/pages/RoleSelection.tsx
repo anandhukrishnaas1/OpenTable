@@ -1,3 +1,10 @@
+/**
+ * @module RoleSelection
+ * @description Post-authentication role picker. Presents Donor, Volunteer,
+ * and Admin role cards. Persists the selected role to Firestore and
+ * navigates to the appropriate dashboard. Admin access requires the
+ * admin secret passphrase for elevated privileges.
+ */
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Layout } from '../components/Layout';

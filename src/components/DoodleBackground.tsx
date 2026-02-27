@@ -1,3 +1,9 @@
+/**
+ * @module DoodleBackground
+ * @description Decorative SVG background component rendered behind page content.
+ * Uses subtle hand-drawn doodle patterns (hearts, leaves, circles, stars) in
+ * muted green tones for visual texture without distracting from main content.
+ */
 import React from 'react';
 
 export const DoodleBackground: React.FC = () => {

@@ -1,3 +1,10 @@
+/**
+ * @module TransparencyLedger
+ * @description Public-facing impact dashboard displaying real-time metrics:
+ * kilograms rescued, deliveries completed, and active volunteers. Features
+ * donor and volunteer leaderboards computed from Firestore donation data.
+ * Demonstrates full accountability and trust transparency.
+ */
 import React from 'react';
 import { Layout } from '../components/Layout';
 import { Leaf, Users, Star, Truck, Award, TrendingUp } from 'lucide-react';
