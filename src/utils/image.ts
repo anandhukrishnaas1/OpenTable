@@ -16,18 +16,18 @@
  * ```
  */
 export function formatImageForUpload(file: File): Promise<string> {
-    return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-            if (typeof reader.result === 'string') {
-                resolve(reader.result);
-            } else {
-                reject(new Error('Failed to read file as base64'));
-            }
-        };
-        reader.onerror = () => reject(new Error('FileReader error'));
-        reader.readAsDataURL(file);
-    });
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      if (typeof reader.result === 'string') {
+        resolve(reader.result);
+      } else {
+        reject(new Error('Failed to read file as base64'));
+      }
+    };
+    reader.onerror = () => reject(new Error('FileReader error'));
+    reader.readAsDataURL(file);
+  });
 }
 
 /**
@@ -40,34 +40,34 @@ export function formatImageForUpload(file: File): Promise<string> {
  * @returns {Promise<string>} Compressed base64-encoded data URL
  */
 export function compressImage(
-    base64Image: string,
-    maxWidth = 1200,
-    quality = 0.8
+  base64Image: string,
+  maxWidth = 1200,
+  quality = 0.8
 ): Promise<string> {
-    return new Promise((resolve, reject) => {
-        const img = new Image();
-        img.onload = () => {
-            const canvas = document.createElement('canvas');
-            let { width, height } = img;
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      let { width, height } = img;
 
-            if (width > maxWidth) {
-                height = (height * maxWidth) / width;
-                width = maxWidth;
-            }
+      if (width > maxWidth) {
+        height = (height * maxWidth) / width;
+        width = maxWidth;
+      }
 
-            canvas.width = width;
-            canvas.height = height;
+      canvas.width = width;
+      canvas.height = height;
 
-            const ctx = canvas.getContext('2d');
-            if (!ctx) {
-                reject(new Error('Could not get canvas context'));
-                return;
-            }
+      const ctx = canvas.getContext('2d');
+      if (!ctx) {
+        reject(new Error('Could not get canvas context'));
+        return;
+      }
 
-            ctx.drawImage(img, 0, 0, width, height);
-            resolve(canvas.toDataURL('image/jpeg', quality));
-        };
-        img.onerror = () => reject(new Error('Failed to load image for compression'));
-        img.src = base64Image;
-    });
+      ctx.drawImage(img, 0, 0, width, height);
+      resolve(canvas.toDataURL('image/jpeg', quality));
+    };
+    img.onerror = () => reject(new Error('Failed to load image for compression'));
+    img.src = base64Image;
+  });
 }

@@ -59,10 +59,10 @@ export const DonationProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       const donationRef = doc(db, 'donations', item.id || Math.random().toString(36).substr(2, 9));
       await setDoc(donationRef, {
         ...item,
-        timestamp: item.timestamp instanceof Date ? item.timestamp.toISOString() : item.timestamp
+        timestamp: item.timestamp instanceof Date ? item.timestamp.toISOString() : item.timestamp,
       });
     } catch (error) {
-      console.error("Error adding donation:", error);
+      console.error('Error adding donation:', error);
       throw error;
     }
   };
@@ -72,10 +72,10 @@ export const DonationProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       const donationRef = doc(db, 'donations', id);
       await updateDoc(donationRef, {
         status: 'claimed',
-        claimedBy: volunteerEmail
+        claimedBy: volunteerEmail,
       });
     } catch (error) {
-      console.error("Error claiming donation:", error);
+      console.error('Error claiming donation:', error);
     }
   };
 
@@ -84,10 +84,10 @@ export const DonationProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       const donationRef = doc(db, 'donations', id);
       await updateDoc(donationRef, {
         status: 'delivered',
-        deliveryProofUrl: proofUrl
+        deliveryProofUrl: proofUrl,
       });
     } catch (error) {
-      console.error("Error completing delivery:", error);
+      console.error('Error completing delivery:', error);
     }
   };
 
@@ -95,15 +95,17 @@ export const DonationProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     try {
       const donationRef = doc(db, 'donations', id);
       await updateDoc(donationRef, {
-        clappedByAdmin: true
+        clappedByAdmin: true,
       });
     } catch (error) {
-      console.error("Error clapping for delivery:", error);
+      console.error('Error clapping for delivery:', error);
     }
   };
 
   return (
-    <DonationContext.Provider value={{ donations, addDonation, claimDonation, completeDelivery, clapForDelivery }}>
+    <DonationContext.Provider
+      value={{ donations, addDonation, claimDonation, completeDelivery, clapForDelivery }}
+    >
       {children}
     </DonationContext.Provider>
   );

@@ -1,7 +1,14 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import type { User} from 'firebase/auth';
+import type { User } from 'firebase/auth';
 import { onAuthStateChanged } from 'firebase/auth';
-import { auth, signInWithGoogle, logout, loginWithEmail, registerWithEmail, db } from '../services/firebase';
+import {
+  auth,
+  signInWithGoogle,
+  logout,
+  loginWithEmail,
+  registerWithEmail,
+  db,
+} from '../services/firebase';
 import { doc, onSnapshot } from 'firebase/firestore';
 
 interface AuthContextType {
@@ -40,22 +47,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (currentUser) {
         // Real-time listener on user document — role changes reflect instantly
         const userDocRef = doc(db, 'users', currentUser.uid);
-        unsubscribeRole = onSnapshot(userDocRef, (docSnap) => {
-          if (docSnap.exists()) {
-            const role = docSnap.data().role;
-            setIsAdmin(role === 'admin');
-            setIsVerifiedVolunteer(role === 'volunteer');
-          } else {
+        unsubscribeRole = onSnapshot(
+          userDocRef,
+          (docSnap) => {
+            if (docSnap.exists()) {
+              const role = docSnap.data().role;
+              setIsAdmin(role === 'admin');
+              setIsVerifiedVolunteer(role === 'volunteer');
+            } else {
+              setIsAdmin(false);
+              setIsVerifiedVolunteer(false);
+            }
+            setLoading(false);
+          },
+          (error) => {
+            console.error('Error listening to user role:', error);
             setIsAdmin(false);
             setIsVerifiedVolunteer(false);
+            setLoading(false);
           }
-          setLoading(false);
-        }, (error) => {
-          console.error("Error listening to user role:", error);
-          setIsAdmin(false);
-          setIsVerifiedVolunteer(false);
-          setLoading(false);
-        });
+        );
       } else {
         setIsAdmin(false);
         setIsVerifiedVolunteer(false);
@@ -86,7 +97,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <AuthContext.Provider value={{ user, isAdmin, isVerifiedVolunteer, loading, signInGoogle, signInEmail, signUpEmail, signOut }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        isAdmin,
+        isVerifiedVolunteer,
+        loading,
+        signInGoogle,
+        signInEmail,
+        signUpEmail,
+        signOut,
+      }}
+    >
       {!loading && children}
     </AuthContext.Provider>
   );

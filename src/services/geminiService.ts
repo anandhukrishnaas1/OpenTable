@@ -58,7 +58,7 @@ Return ONLY the JSON object, no markdown, no code fences, no explanation.`;
     const response = await fetch(API_URLS.OPENROUTER, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${env.OPENROUTER_API_KEY}`,
+        Authorization: `Bearer ${env.OPENROUTER_API_KEY}`,
         'Content-Type': 'application/json',
         'HTTP-Referer': window.location.origin,
         'X-Title': AI_CONFIG.APP_NAME,
@@ -111,7 +111,10 @@ Return ONLY the JSON object, no markdown, no code fences, no explanation.`;
 const parseAIResponse = (text: string): ScanResult => {
   try {
     // Remove any markdown code fences if present
-    let cleanedText = text.replace(/```json\s*/g, '').replace(/```\s*/g, '').trim();
+    let cleanedText = text
+      .replace(/```json\s*/g, '')
+      .replace(/```\s*/g, '')
+      .trim();
 
     // Try to extract JSON if there's surrounding text
     const jsonMatch = cleanedText.match(/\{[\s\S]*\}/);

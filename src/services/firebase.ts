@@ -104,7 +104,12 @@ export const signInWithGoogle = async () => {
  * @returns {Promise<import('firebase/auth').User>} The newly created Firebase user
  * @throws {Error} If registration fails
  */
-export const registerWithEmail = async (email: string, pass: string, name: string, phone: string) => {
+export const registerWithEmail = async (
+  email: string,
+  pass: string,
+  name: string,
+  phone: string
+) => {
   try {
     const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
     const user = userCredential.user;

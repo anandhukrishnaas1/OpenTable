@@ -25,7 +25,9 @@ const RoleSelection: React.FC = () => {
           Choose your role to get started with OpenTable.
         </p>
 
-        <div className={`grid gap-8 max-w-4xl mx-auto ${isAdmin ? 'md:grid-cols-3' : 'md:grid-cols-2 max-w-2xl'}`}>
+        <div
+          className={`grid gap-8 max-w-4xl mx-auto ${isAdmin ? 'md:grid-cols-3' : 'md:grid-cols-2 max-w-2xl'}`}
+        >
           {/* OPTION 1: DONOR */}
           <button
             onClick={() => navigate('/menu')} // <--- FIX: GO DIRECTLY TO MENU
@@ -79,7 +81,6 @@ const RoleSelection: React.FC = () => {
               </div>
             </button>
           )}
-
         </div>
       </div>
     </Layout>

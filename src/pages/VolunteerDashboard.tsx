@@ -1,6 +1,16 @@
 import React, { useState, useRef } from 'react';
 import { Layout } from '../components/Layout';
-import { MapPin, Phone, CheckCircle, Clock, ExternalLink, Camera, X, Truck, AlertTriangle } from 'lucide-react';
+import {
+  MapPin,
+  Phone,
+  CheckCircle,
+  Clock,
+  ExternalLink,
+  Camera,
+  X,
+  Truck,
+  AlertTriangle,
+} from 'lucide-react';
 import type { DonationItem } from '../contexts/DonationContext';
 import { useDonations } from '../contexts/DonationContext';
 import { useAuth } from '../contexts/AuthContext';
@@ -16,7 +26,9 @@ const VolunteerDashboard: React.FC = () => {
   const { user, isVerifiedVolunteer } = useAuth();
   const { applications } = useAdmin();
 
-  const [activeTab, setActiveTab] = useState<'available' | 'mydeliveries' | 'completed' | 'expired'>('available');
+  const [activeTab, setActiveTab] = useState<
+    'available' | 'mydeliveries' | 'completed' | 'expired'
+  >('available');
 
   // Helper: parse expiresIn string and check if a donation has expired
   const getExpiryInfo = (donation: DonationItem): { expired: boolean; remainingText: string } => {
@@ -66,14 +78,20 @@ const VolunteerDashboard: React.FC = () => {
   const { toast, showToast, hideToast } = useToast();
 
   // Check verification: either from user's own role OR from the applications list
-  const isVerified = isVerifiedVolunteer || applications.some(app => app.email === user?.email && app.status === 'Verified');
+  const isVerified =
+    isVerifiedVolunteer ||
+    applications.some((app) => app.email === user?.email && app.status === 'Verified');
 
   // Filter donations with expiry awareness
-  const allActive = donations.filter(d => d.status === 'active');
-  const availablePickups = allActive.filter(d => !getExpiryInfo(d).expired);
-  const expiredDonations = allActive.filter(d => getExpiryInfo(d).expired);
-  const myDeliveries = donations.filter(d => d.status === 'claimed' && d.claimedBy === user?.email);
-  const completedDeliveries = donations.filter(d => d.status === 'delivered' && d.claimedBy === user?.email);
+  const allActive = donations.filter((d) => d.status === 'active');
+  const availablePickups = allActive.filter((d) => !getExpiryInfo(d).expired);
+  const expiredDonations = allActive.filter((d) => getExpiryInfo(d).expired);
+  const myDeliveries = donations.filter(
+    (d) => d.status === 'claimed' && d.claimedBy === user?.email
+  );
+  const completedDeliveries = donations.filter(
+    (d) => d.status === 'delivered' && d.claimedBy === user?.email
+  );
 
   // Helper to open Google Maps
   const openMaps = (address: string) => {
@@ -84,7 +102,10 @@ const VolunteerDashboard: React.FC = () => {
       window.open(`https://www.google.com/maps/search/?api=1&query=${query}`, '_blank');
     } else {
       // Standard address search
-      window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`, '_blank');
+      window.open(
+        `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`,
+        '_blank'
+      );
     }
   };
 
@@ -94,10 +115,12 @@ const VolunteerDashboard: React.FC = () => {
     setIsCameraOpen(true);
     setProofImage(null);
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: 'environment' },
+      });
       if (videoRef.current) videoRef.current.srcObject = stream;
     } catch {
-      showToast("Could not access camera.", 'error');
+      showToast('Could not access camera.', 'error');
       setIsCameraOpen(false);
     }
   };
@@ -113,7 +136,7 @@ const VolunteerDashboard: React.FC = () => {
       setProofImage(photoData);
 
       const stream = video.srcObject as MediaStream;
-      stream.getTracks().forEach(track => track.stop());
+      stream.getTracks().forEach((track) => track.stop());
       setIsCameraOpen(false);
     }
   };
@@ -126,10 +149,10 @@ const VolunteerDashboard: React.FC = () => {
         await completeDelivery(selectedDonationId, cloudinaryUrl);
         setSelectedDonationId(null);
         setProofImage(null);
-        showToast("Delivery recorded! Thank you for closing the loop.", 'success');
+        showToast('Delivery recorded! Thank you for closing the loop.', 'success');
       } catch (error: unknown) {
         const message = error instanceof Error ? error.message : 'Unknown error';
-        showToast("Failed to upload proof: " + message, 'error');
+        showToast('Failed to upload proof: ' + message, 'error');
       } finally {
         setIsSubmitting(false);
       }
@@ -138,41 +161,60 @@ const VolunteerDashboard: React.FC = () => {
 
   return (
     <Layout>
-      <Toast message={toast.message} type={toast.type} isVisible={toast.visible} onClose={hideToast} />
+      <Toast
+        message={toast.message}
+        type={toast.type}
+        isVisible={toast.visible}
+        onClose={hideToast}
+      />
       <div className="max-w-4xl mx-auto px-6 py-10">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Volunteer Dashboard</h1>
-          <p className="text-gray-500">Pick up food and upload proof of delivery to complete tickets.</p>
+          <p className="text-gray-500">
+            Pick up food and upload proof of delivery to complete tickets.
+          </p>
         </div>
 
         {/* TABS */}
         <div className="bg-gray-100/80 rounded-full p-1.5 mb-10 flex shadow-sm border border-gray-100 max-w-2xl">
           <button
             onClick={() => setActiveTab('available')}
-            className={`flex-1 py-3 px-6 rounded-full text-sm font-bold transition-all ${activeTab === 'available' ? 'bg-white text-green-700 shadow-sm' : 'text-gray-500 hover:text-gray-900'
-              }`}
+            className={`flex-1 py-3 px-6 rounded-full text-sm font-bold transition-all ${
+              activeTab === 'available'
+                ? 'bg-white text-green-700 shadow-sm'
+                : 'text-gray-500 hover:text-gray-900'
+            }`}
           >
             Available Pickups ({availablePickups.length})
           </button>
           <button
             onClick={() => setActiveTab('mydeliveries')}
-            className={`flex-1 py-3 px-6 rounded-full text-sm font-bold transition-all ${activeTab === 'mydeliveries' ? 'bg-white text-blue-700 shadow-sm' : 'text-gray-500 hover:text-gray-900'
-              }`}
+            className={`flex-1 py-3 px-6 rounded-full text-sm font-bold transition-all ${
+              activeTab === 'mydeliveries'
+                ? 'bg-white text-blue-700 shadow-sm'
+                : 'text-gray-500 hover:text-gray-900'
+            }`}
           >
             My Deliveries ({myDeliveries.length})
           </button>
           <button
             onClick={() => setActiveTab('completed')}
-            className={`flex-1 py-3 px-6 rounded-full text-sm font-bold transition-all ${activeTab === 'completed' ? 'bg-white text-green-700 shadow-sm' : 'text-gray-500 hover:text-gray-900'
-              }`}
+            className={`flex-1 py-3 px-6 rounded-full text-sm font-bold transition-all ${
+              activeTab === 'completed'
+                ? 'bg-white text-green-700 shadow-sm'
+                : 'text-gray-500 hover:text-gray-900'
+            }`}
           >
             Completed ({completedDeliveries.length})
           </button>
           {expiredDonations.length > 0 && (
             <button
               onClick={() => setActiveTab('expired')}
-              className={`flex-1 py-3 px-6 rounded-full text-sm font-bold transition-all ${activeTab === 'expired' ? 'bg-white text-red-700 shadow-sm' : 'text-gray-500 hover:text-gray-900'
-                }`}
+              className={`flex-1 py-3 px-6 rounded-full text-sm font-bold transition-all ${
+                activeTab === 'expired'
+                  ? 'bg-white text-red-700 shadow-sm'
+                  : 'text-gray-500 hover:text-gray-900'
+              }`}
             >
               Expired ({expiredDonations.length})
             </button>
@@ -182,11 +224,18 @@ const VolunteerDashboard: React.FC = () => {
         {activeTab === 'available' && (
           <div className="grid gap-8">
             {availablePickups.map((pickup) => (
-              <div key={pickup.id} className="bg-white p-8 rounded-[2rem] shadow-[0_4px_20px_rgb(0,0,0,0.03)] border border-gray-100 hover:border-gray-200 transition-all">
+              <div
+                key={pickup.id}
+                className="bg-white p-8 rounded-[2rem] shadow-[0_4px_20px_rgb(0,0,0,0.03)] border border-gray-100 hover:border-gray-200 transition-all"
+              >
                 <div className="flex justify-between items-start gap-4">
                   <div className="flex gap-4">
                     {pickup.imageUrl && (
-                      <img src={pickup.imageUrl} alt={pickup.item} className="w-24 h-24 rounded-xl object-cover bg-gray-100" />
+                      <img
+                        src={pickup.imageUrl}
+                        alt={pickup.item}
+                        className="w-24 h-24 rounded-xl object-cover bg-gray-100"
+                      />
                     )}
                     <div>
                       <h3 className="text-xl font-bold text-gray-900">{pickup.item}</h3>
@@ -204,7 +253,10 @@ const VolunteerDashboard: React.FC = () => {
                     </div>
                   </div>
                   <div className="text-right text-xs text-gray-400">
-                    {new Date(pickup.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    {new Date(pickup.timestamp).toLocaleTimeString([], {
+                      hour: '2-digit',
+                      minute: '2-digit',
+                    })}
                   </div>
                 </div>
 
@@ -233,7 +285,7 @@ const VolunteerDashboard: React.FC = () => {
                           claimDonation(pickup.id, user.email);
                           setActiveTab('mydeliveries'); // switch tabs automatically
                         } else {
-                          showToast("Please log in to claim.", 'warning');
+                          showToast('Please log in to claim.', 'warning');
                         }
                       }}
                       className="flex-1 bg-green-600 text-white font-bold py-4 rounded-full hover:bg-green-700 transition-colors flex items-center justify-center gap-2 shadow-sm"
@@ -275,10 +327,15 @@ const VolunteerDashboard: React.FC = () => {
         {activeTab === 'mydeliveries' && (
           <div className="grid gap-8">
             {myDeliveries.map((delivery) => (
-              <div key={delivery.id} className="bg-white p-8 rounded-[2rem] shadow-[0_4px_20px_rgb(0,0,0,0.03)] border border-blue-50/50 hover:border-blue-100 transition-all">
+              <div
+                key={delivery.id}
+                className="bg-white p-8 rounded-[2rem] shadow-[0_4px_20px_rgb(0,0,0,0.03)] border border-blue-50/50 hover:border-blue-100 transition-all"
+              >
                 <div className="flex justify-between items-start mb-6">
                   <div>
-                    <span className="text-xs font-bold bg-blue-50 text-blue-700 px-3 py-1.5 rounded-full">In Progress</span>
+                    <span className="text-xs font-bold bg-blue-50 text-blue-700 px-3 py-1.5 rounded-full">
+                      In Progress
+                    </span>
                     <h3 className="text-2xl font-bold text-gray-900 mt-3">{delivery.item}</h3>
                     <p className="text-gray-500 font-medium">{delivery.quantity}</p>
                   </div>
@@ -286,7 +343,9 @@ const VolunteerDashboard: React.FC = () => {
 
                 {/* Drop-off Location + Live Map */}
                 <div className="bg-gray-50 p-5 rounded-2xl mb-4 border border-gray-100/50">
-                  <p className="font-bold text-sm text-gray-700 flex items-center gap-2 mb-1"><MapPin size={16} /> Drop-off Location</p>
+                  <p className="font-bold text-sm text-gray-700 flex items-center gap-2 mb-1">
+                    <MapPin size={16} /> Drop-off Location
+                  </p>
                   <p className="text-gray-600 text-sm ml-6 mb-3">{delivery.address}</p>
 
                   {/* Embedded Google Maps */}
@@ -307,9 +366,15 @@ const VolunteerDashboard: React.FC = () => {
                     <button
                       onClick={() => {
                         const dest = delivery.address.includes('Lat:')
-                          ? delivery.address.replace('Lat:', '').replace('Long:', '').replace(/\s/g, '')
+                          ? delivery.address
+                              .replace('Lat:', '')
+                              .replace('Long:', '')
+                              .replace(/\s/g, '')
                           : encodeURIComponent(delivery.address);
-                        window.open(`https://www.google.com/maps/dir/?api=1&destination=${dest}&travelmode=driving`, '_blank');
+                        window.open(
+                          `https://www.google.com/maps/dir/?api=1&destination=${dest}&travelmode=driving`,
+                          '_blank'
+                        );
                       }}
                       className="flex-1 flex items-center justify-center gap-2 bg-blue-600 text-white font-bold py-3 rounded-xl hover:bg-blue-700 transition-all shadow-sm"
                     >
@@ -329,7 +394,10 @@ const VolunteerDashboard: React.FC = () => {
                   <h4 className="font-bold text-sm mb-3">Require Proof of Delivery</h4>
 
                   {!proofImage && selectedDonationId !== delivery.id && !isCameraOpen && (
-                    <button onClick={() => startCamera(delivery.id)} className="w-full bg-gray-900 text-white py-4 rounded-full font-bold flex items-center justify-center gap-2 hover:bg-black transition-transform hover:-translate-y-0.5 shadow-lg">
+                    <button
+                      onClick={() => startCamera(delivery.id)}
+                      className="w-full bg-gray-900 text-white py-4 rounded-full font-bold flex items-center justify-center gap-2 hover:bg-black transition-transform hover:-translate-y-0.5 shadow-lg"
+                    >
                       <Camera size={20} /> Take Delivery Photo
                     </button>
                   )}
@@ -337,11 +405,24 @@ const VolunteerDashboard: React.FC = () => {
                   {/* Camera view specifically for this item */}
                   {isCameraOpen && selectedDonationId === delivery.id && (
                     <div className="relative bg-black rounded-2xl overflow-hidden shadow-xl mb-4 mt-2">
-                      <video ref={videoRef} autoPlay playsInline className="w-full h-64 object-cover" />
+                      <video
+                        ref={videoRef}
+                        autoPlay
+                        playsInline
+                        className="w-full h-64 object-cover"
+                      />
                       <canvas ref={canvasRef} className="hidden" />
                       <div className="absolute bottom-4 left-0 right-0 flex justify-center items-center gap-8">
-                        <button onClick={() => setIsCameraOpen(false)} className="bg-white/20 backdrop-blur-md p-3 rounded-full text-white"><X size={20} /></button>
-                        <button onClick={capturePhoto} className="bg-white p-1 rounded-full border-4 border-gray-200">
+                        <button
+                          onClick={() => setIsCameraOpen(false)}
+                          className="bg-white/20 backdrop-blur-md p-3 rounded-full text-white"
+                        >
+                          <X size={20} />
+                        </button>
+                        <button
+                          onClick={capturePhoto}
+                          className="bg-white p-1 rounded-full border-4 border-gray-200"
+                        >
                           <div className="w-12 h-12 bg-white border-4 border-black rounded-full" />
                         </button>
                         <div className="w-12" />
@@ -354,15 +435,23 @@ const VolunteerDashboard: React.FC = () => {
                     <div className="mt-4">
                       <img src={proofImage} className="w-full h-48 object-cover rounded-xl mb-4" />
                       <div className="flex gap-2">
-                        <button onClick={() => setProofImage(null)} className="flex-1 bg-gray-100 py-3 rounded-xl font-bold">Retake</button>
-                        <button onClick={submitProof} disabled={isSubmitting} className="flex-1 bg-green-600 text-white font-bold py-3 rounded-xl shadow-lg disabled:bg-green-400">
+                        <button
+                          onClick={() => setProofImage(null)}
+                          className="flex-1 bg-gray-100 py-3 rounded-xl font-bold"
+                        >
+                          Retake
+                        </button>
+                        <button
+                          onClick={submitProof}
+                          disabled={isSubmitting}
+                          className="flex-1 bg-green-600 text-white font-bold py-3 rounded-xl shadow-lg disabled:bg-green-400"
+                        >
                           {isSubmitting ? 'Uploading...' : 'Submit & Close Ticket'}
                         </button>
                       </div>
                     </div>
                   )}
                 </div>
-
               </div>
             ))}
 
@@ -380,10 +469,15 @@ const VolunteerDashboard: React.FC = () => {
         {activeTab === 'completed' && (
           <div className="grid gap-8">
             {completedDeliveries.map((delivery) => (
-              <div key={delivery.id} className="bg-white p-8 rounded-[2rem] shadow-[0_4px_20px_rgb(0,0,0,0.03)] border border-green-50 transition-all">
+              <div
+                key={delivery.id}
+                className="bg-white p-8 rounded-[2rem] shadow-[0_4px_20px_rgb(0,0,0,0.03)] border border-green-50 transition-all"
+              >
                 <div className="flex justify-between items-start mb-4">
                   <div>
-                    <span className="text-xs font-bold bg-green-50 text-green-700 px-3 py-1.5 rounded-full">✅ Delivered</span>
+                    <span className="text-xs font-bold bg-green-50 text-green-700 px-3 py-1.5 rounded-full">
+                      ✅ Delivered
+                    </span>
                     <h3 className="text-2xl font-bold text-gray-900 mt-3">{delivery.item}</h3>
                     <p className="text-gray-500 font-medium">{delivery.quantity}</p>
                   </div>
@@ -396,14 +490,20 @@ const VolunteerDashboard: React.FC = () => {
                 </div>
 
                 <div className="bg-gray-50 p-4 rounded-2xl mb-4 border border-gray-100/50">
-                  <p className="font-bold text-sm text-gray-700 flex items-center gap-2 mb-1"><MapPin size={16} /> Delivered to</p>
+                  <p className="font-bold text-sm text-gray-700 flex items-center gap-2 mb-1">
+                    <MapPin size={16} /> Delivered to
+                  </p>
                   <p className="text-gray-600 text-sm ml-6">{delivery.address}</p>
                 </div>
 
                 {delivery.deliveryProofUrl && (
                   <div>
                     <p className="font-bold text-sm text-gray-700 mb-2">📸 Delivery Proof</p>
-                    <img src={delivery.deliveryProofUrl} alt="Delivery proof" className="w-full h-48 object-cover rounded-xl border border-gray-100" />
+                    <img
+                      src={delivery.deliveryProofUrl}
+                      alt="Delivery proof"
+                      className="w-full h-48 object-cover rounded-xl border border-gray-100"
+                    />
                   </div>
                 )}
               </div>
@@ -413,7 +513,9 @@ const VolunteerDashboard: React.FC = () => {
               <div className="text-center py-16 bg-gray-50 rounded-3xl border border-dashed border-gray-200">
                 <CheckCircle size={48} className="mx-auto mb-4 text-gray-300" />
                 <h3 className="text-lg font-bold text-gray-900">No completed deliveries yet</h3>
-                <p className="text-gray-500">Once you deliver food and submit proof, they will appear here.</p>
+                <p className="text-gray-500">
+                  Once you deliver food and submit proof, they will appear here.
+                </p>
               </div>
             )}
           </div>
@@ -423,21 +525,33 @@ const VolunteerDashboard: React.FC = () => {
           <div className="grid gap-8">
             <div className="bg-red-50 border border-red-200 rounded-2xl p-4 flex items-center gap-3">
               <AlertTriangle size={20} className="text-red-500 shrink-0" />
-              <p className="text-sm text-red-700 font-medium">These food items have passed their estimated safe consumption window and can no longer be accepted for delivery.</p>
+              <p className="text-sm text-red-700 font-medium">
+                These food items have passed their estimated safe consumption window and can no
+                longer be accepted for delivery.
+              </p>
             </div>
 
             {expiredDonations.map((item) => (
-              <div key={item.id} className="bg-white p-8 rounded-[2rem] shadow-[0_4px_20px_rgb(0,0,0,0.03)] border border-red-100 opacity-75">
+              <div
+                key={item.id}
+                className="bg-white p-8 rounded-[2rem] shadow-[0_4px_20px_rgb(0,0,0,0.03)] border border-red-100 opacity-75"
+              >
                 <div className="flex justify-between items-start gap-4">
                   <div className="flex gap-4">
                     {item.imageUrl && (
-                      <img src={item.imageUrl} alt={item.item} className="w-24 h-24 rounded-xl object-cover bg-gray-100 grayscale" />
+                      <img
+                        src={item.imageUrl}
+                        alt={item.item}
+                        className="w-24 h-24 rounded-xl object-cover bg-gray-100 grayscale"
+                      />
                     )}
                     <div>
                       <h3 className="text-xl font-bold text-gray-900">{item.item}</h3>
                       <p className="text-gray-400 font-medium">{item.quantity}</p>
                       <div className="flex items-center gap-2 mt-2">
-                        <span className="bg-gray-100 text-gray-600 text-xs font-bold px-2 py-1 rounded">{item.donorType}</span>
+                        <span className="bg-gray-100 text-gray-600 text-xs font-bold px-2 py-1 rounded">
+                          {item.donorType}
+                        </span>
                         <span className="bg-red-100 text-red-700 text-xs font-bold px-2 py-1 rounded flex items-center gap-1">
                           <AlertTriangle size={12} /> Expired
                         </span>
@@ -446,7 +560,9 @@ const VolunteerDashboard: React.FC = () => {
                   </div>
                 </div>
                 {item.expiresIn && (
-                  <p className="text-xs text-gray-400 mt-3">Original shelf life: {item.expiresIn} from donation</p>
+                  <p className="text-xs text-gray-400 mt-3">
+                    Original shelf life: {item.expiresIn} from donation
+                  </p>
                 )}
               </div>
             ))}
@@ -455,12 +571,13 @@ const VolunteerDashboard: React.FC = () => {
               <div className="text-center py-16 bg-gray-50 rounded-3xl border border-dashed border-gray-200">
                 <CheckCircle size={48} className="mx-auto mb-4 text-green-300" />
                 <h3 className="text-lg font-bold text-gray-900">No expired items</h3>
-                <p className="text-gray-500">All donations are still within their safe consumption window.</p>
+                <p className="text-gray-500">
+                  All donations are still within their safe consumption window.
+                </p>
               </div>
             )}
           </div>
         )}
-
       </div>
     </Layout>
   );

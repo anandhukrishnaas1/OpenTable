@@ -10,7 +10,9 @@ const DashboardSelection: React.FC = () => {
   return (
     <Layout>
       <div className="max-w-4xl mx-auto px-6 py-20 text-center animate-in fade-in duration-500">
-        <h2 className="text-3xl font-bold text-gray-900 mb-2">Welcome, {user?.displayName?.split(' ')[0]}!</h2>
+        <h2 className="text-3xl font-bold text-gray-900 mb-2">
+          Welcome, {user?.displayName?.split(' ')[0]}!
+        </h2>
         <p className="text-gray-500 mb-12">How would you like to help today?</p>
 
         <div className="grid md:grid-cols-2 gap-8">

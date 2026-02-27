@@ -51,7 +51,7 @@ const LoginPage: React.FC = () => {
     } catch (err: unknown) {
       console.error(err);
       const message = err instanceof Error ? err.message : 'Unknown error';
-      setError("Google Login Error: " + message.replace('Firebase: ', ''));
+      setError('Google Login Error: ' + message.replace('Firebase: ', ''));
     } finally {
       setLoading(false);
     }
@@ -61,16 +61,21 @@ const LoginPage: React.FC = () => {
     <Layout>
       <div className="flex items-center justify-center py-16 px-6 bg-gray-50/50 min-h-[80vh]">
         <div className="bg-white p-8 md:p-10 rounded-3xl shadow-xl border border-gray-100 max-w-md w-full">
-
           <div className="text-center mb-8">
             <div className="w-20 h-20 rounded-2xl mx-auto mb-4 overflow-hidden shadow-sm border border-gray-100 bg-white flex items-center justify-center">
-              <img src="/logo.png" alt="OpenTable Logo" className="w-full h-full object-contain p-2" />
+              <img
+                src="/logo.png"
+                alt="OpenTable Logo"
+                className="w-full h-full object-contain p-2"
+              />
             </div>
             <h2 className="text-2xl font-bold text-gray-900">
               {isRegistering ? 'Create Account' : 'Welcome Back'}
             </h2>
             <p className="text-gray-500 text-sm">
-              {isRegistering ? 'Join the movement to end food waste' : 'Sign in to continue to OpenTable'}
+              {isRegistering
+                ? 'Join the movement to end food waste'
+                : 'Sign in to continue to OpenTable'}
             </p>
           </div>
 
@@ -143,8 +148,12 @@ const LoginPage: React.FC = () => {
           </form>
 
           <div className="relative my-8">
-            <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-gray-200" /></div>
-            <div className="relative flex justify-center text-sm"><span className="px-4 bg-white text-gray-500">Or continue with</span></div>
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-gray-200" />
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="px-4 bg-white text-gray-500">Or continue with</span>
+            </div>
           </div>
 
           <button
@@ -157,7 +166,7 @@ const LoginPage: React.FC = () => {
 
           <div className="text-center mt-8">
             <p className="text-sm text-gray-600">
-              {isRegistering ? "Already have an account?" : "Don't have an account?"}
+              {isRegistering ? 'Already have an account?' : "Don't have an account?"}
               <button
                 onClick={() => setIsRegistering(!isRegistering)}
                 className="text-green-600 font-bold ml-1 hover:underline"
@@ -166,7 +175,6 @@ const LoginPage: React.FC = () => {
               </button>
             </p>
           </div>
-
         </div>
       </div>
     </Layout>
