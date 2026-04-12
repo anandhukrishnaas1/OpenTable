@@ -84,9 +84,9 @@ const Toast: React.FC<ToastProps> = ({ message, type, isVisible, onClose, durati
 
   return (
     <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[9999] animate-slide-down w-[90vw] max-w-md">
-      <div 
+      <div
         className={`${c.bg} border rounded-2xl shadow-xl overflow-hidden`}
-        role="alert" 
+        role="alert"
         aria-live="assertive"
       >
         <div

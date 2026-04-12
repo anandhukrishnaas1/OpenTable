@@ -21,15 +21,15 @@ describe('geminiService - analyzeFoodImage', () => {
   "safeToEat": "Yes",
   "confidence": "95%"
 }
-\`\`\``
-          }
-        }
-      ]
+\`\`\``,
+          },
+        },
+      ],
     };
 
     (global.fetch as unknown as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
       ok: true,
-      json: async () => mockApiResponse
+      json: async () => mockApiResponse,
     });
 
     const result = await analyzeFoodImage('data:image/jpeg;base64,fakebase64');
@@ -42,9 +42,11 @@ describe('geminiService - analyzeFoodImage', () => {
     (global.fetch as unknown as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
       ok: false,
       status: 401,
-      text: async () => 'Unauthorized'
+      text: async () => 'Unauthorized',
     });
 
-    await expect(analyzeFoodImage('fakebase64')).rejects.toThrow('API request failed with status 401: Unauthorized');
+    await expect(analyzeFoodImage('fakebase64')).rejects.toThrow(
+      'API request failed with status 401: Unauthorized'
+    );
   });
 });

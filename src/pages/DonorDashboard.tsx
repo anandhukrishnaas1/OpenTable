@@ -53,18 +53,21 @@ const DonorDashboard: React.FC = () => {
     }
   }, [showToast]);
 
-  const performAnalysis = useCallback(async (imageBase64: string) => {
-    setAnalyzing(true);
-    try {
-      const result = await analyzeFoodImage(imageBase64);
-      setScanResult(result);
-    } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : 'Unknown error';
-      showToast('Analysis failed: ' + message, 'error');
-    } finally {
-      setAnalyzing(false);
-    }
-  }, [showToast]);
+  const performAnalysis = useCallback(
+    async (imageBase64: string) => {
+      setAnalyzing(true);
+      try {
+        const result = await analyzeFoodImage(imageBase64);
+        setScanResult(result);
+      } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : 'Unknown error';
+        showToast('Analysis failed: ' + message, 'error');
+      } finally {
+        setAnalyzing(false);
+      }
+    },
+    [showToast]
+  );
 
   const capturePhoto = useCallback(() => {
     if (videoRef.current && canvasRef.current) {
@@ -83,17 +86,20 @@ const DonorDashboard: React.FC = () => {
     }
   }, [videoRef, canvasRef, performAnalysis]);
 
-  const handleImageUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImage(reader.result as string);
-        performAnalysis(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
-  }, [performAnalysis]);
+  const handleImageUpload = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setImage(reader.result as string);
+          performAnalysis(reader.result as string);
+        };
+        reader.readAsDataURL(file);
+      }
+    },
+    [performAnalysis]
+  );
 
   const handleUseCurrentLocation = useCallback(() => {
     setIsLocating(true);
@@ -160,16 +166,33 @@ const DonorDashboard: React.FC = () => {
     } finally {
       setIsSubmitting(false);
     }
-  }, [scanResult, quantity, contactPhone, address, image, donorType, user?.email, addDonation, showToast]);
+  }, [
+    scanResult,
+    quantity,
+    contactPhone,
+    address,
+    image,
+    donorType,
+    user?.email,
+    addDonation,
+    showToast,
+  ]);
 
   // Only show this donor's donations
-  const myDonations = useMemo(() => donations.filter((d) => d.donorEmail === user?.email), [donations, user?.email]);
+  const myDonations = useMemo(
+    () => donations.filter((d) => d.donorEmail === user?.email),
+    [donations, user?.email]
+  );
   // Active = Status is 'active'
-  const activeDonations = useMemo(() => myDonations.filter((d) => d.status === 'active'), [myDonations]);
+  const activeDonations = useMemo(
+    () => myDonations.filter((d) => d.status === 'active'),
+    [myDonations]
+  );
   // History = Volunteer picked it up (claimed) or delivered
-  const historyDonations = useMemo(() => myDonations.filter(
-    (d) => d.status === 'claimed' || d.status === 'delivered'
-  ), [myDonations]);
+  const historyDonations = useMemo(
+    () => myDonations.filter((d) => d.status === 'claimed' || d.status === 'delivered'),
+    [myDonations]
+  );
 
   return (
     <Layout>
