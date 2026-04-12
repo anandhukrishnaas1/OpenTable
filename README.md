@@ -72,11 +72,30 @@
 
 ---
 
-## 💡 Our Solution
+## 🏢 Chosen Vertical
+
+**Vertical:** Social Good / Environmental Sustainability (Food Tech)
+
+We chose this vertical because food waste combined with hunger is an incredibly solvable logistical problem, specifically suited for real-time mobile/web platforms and AI image recognition.
+
+---
+
+## 🎯 Approach and Logic
+
+Our approach focuses on **removing friction** for food donors and **building trust** in the volunteer network. 
+
+**Logic:**
+1. **Donor Friction:** Restaurants won't donate if it takes 10 minutes to fill out a form. We use **Google Gemini AI** to let them just snap a photo—the AI fills in the category, quantity estimates, and safety tags automatically.
+2. **Trust & Safety:** Charities won't accept food from unvetted strangers. We built an identity verification system and a digital "chain of custody" where every pickup and delivery is logged with photo proof.
+3. **Real-time Sync:** Food spoils fast. We use Firebase Firestore to ensure the moment a donor lists food, every volunteer's feed updates instantly without refreshing.
+
+---
+
+## ⚙️ How the Solution Works
 
 **OpenTable** is an AI-powered, real-time food rescue platform that creates a seamless bridge between food donors (restaurants, caterers, households) and communities in need, coordinated by verified volunteers.
 
-### How It Works
+### The Complete Flow
 
 ```mermaid
 graph LR
@@ -87,17 +106,23 @@ graph LR
     E --> F[✅ Admin reviews & applauds]
 ```
 
-### Key Differentiators
-
-- **AI-First Approach** — Gemini multimodal AI auto-categorizes food, estimates freshness, and calculates safe distribution windows
-- **Trust Layer** — Volunteers undergo identity verification (ID + selfie) before accepting deliveries
-- **Full Accountability** — Delivery proof photos are required, creating an auditable chain of custody
-- **Admin Governance** — Admin dashboard for volunteer approval, delivery oversight, and volunteer recognition (👏 clap feature)
-- **Real-Time Sync** — Firebase Firestore provides instant updates across all connected users
+### Feature Roles
+- **Donors:** Snap a photo of surplus food. Google Gemini AI automatically categorizes it and adds safety context. The donation is broadcasted via Firebase to all nearby volunteers instantly.
+- **Volunteers:** Must submit ID and selfie for admin verification. Once approved, they see an active feed of available pickups, accept a task, get Google Maps directions, and must upload photo proof of the final delivery.
+- **Admins:** Oversee the entire ecosystem. They approve/reject volunteer verifications, audit the delivery proofs, and can "clap" (reward) volunteers for completed drives.
 
 ---
 
-## ✨ Key Features
+## 📌 Assumptions Made
+
+1. **Internet Access:** We assume both donors and volunteers have reliable internet access and smartphone cameras to take photos of the food and delivery proofs.
+2. **Platform Moderation:** We assume there is a dedicated Admin team available to review volunteer applications in a timely manner so bottlenecks don't occur.
+3. **Local Geography:** Initially, we assume operations are within a single metropolitan area, meaning any volunteer seeing the feed is reasonably close to the donation pickups (Google Maps handles the exact routing).
+4. **Food Safety Norms:** We assume donors are following basic local health regulations before deciding an item is fit for donation.
+
+---
+
+## 💡 Key Features
 
 ### 🏪 For Donors
 - **AI Food Scanner** — Snap a photo → Gemini AI identifies the food, category, freshness level, and safety window

@@ -4,7 +4,7 @@
  * scanning via camera/upload, donation listing with location and contact
  * details, and real-time tracking of active and completed donations.
  */
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useCallback, useMemo } from 'react';
 import { Camera, Upload, X, MapPin, Package, RefreshCw } from 'lucide-react';
 import { Layout } from '../components/Layout';
 import type { ScanResult } from '../services/geminiService';
@@ -39,7 +39,7 @@ const DonorDashboard: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // --- CAMERA LOGIC (Same as before) ---
-  const startCamera = async () => {
+  const startCamera = useCallback(async () => {
     setIsCameraOpen(true);
     setImage(null);
     try {
@@ -51,9 +51,9 @@ const DonorDashboard: React.FC = () => {
       showToast('Could not access camera.', 'error');
       setIsCameraOpen(false);
     }
-  };
+  }, [showToast]);
 
-  const capturePhoto = () => {
+  const capturePhoto = useCallback(() => {
     if (videoRef.current && canvasRef.current) {
       const video = videoRef.current;
       const canvas = canvasRef.current;
@@ -68,9 +68,9 @@ const DonorDashboard: React.FC = () => {
       setIsCameraOpen(false);
       performAnalysis(photoData);
     }
-  };
+  }, [videoRef, canvasRef, performAnalysis]);
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       const reader = new FileReader();
@@ -80,9 +80,9 @@ const DonorDashboard: React.FC = () => {
       };
       reader.readAsDataURL(file);
     }
-  };
+  }, [performAnalysis]);
 
-  const performAnalysis = async (imageBase64: string) => {
+  const performAnalysis = useCallback(async (imageBase64: string) => {
     setAnalyzing(true);
     try {
       const result = await analyzeFoodImage(imageBase64);
@@ -93,9 +93,9 @@ const DonorDashboard: React.FC = () => {
     } finally {
       setAnalyzing(false);
     }
-  };
+  }, [showToast]);
 
-  const handleUseCurrentLocation = () => {
+  const handleUseCurrentLocation = useCallback(() => {
     setIsLocating(true);
     if ('geolocation' in navigator) {
       navigator.geolocation.getCurrentPosition(
@@ -111,9 +111,9 @@ const DonorDashboard: React.FC = () => {
         }
       );
     }
-  };
+  }, [showToast]);
 
-  const handleFinalSubmit = async () => {
+  const handleFinalSubmit = useCallback(async () => {
     if (!scanResult || !quantity || !contactPhone || !address) {
       showToast('Please fill in all details.', 'warning');
       return;
@@ -160,16 +160,16 @@ const DonorDashboard: React.FC = () => {
     } finally {
       setIsSubmitting(false);
     }
-  };
+  }, [scanResult, quantity, contactPhone, address, image, donorType, user?.email, addDonation, showToast]);
 
   // Only show this donor's donations
-  const myDonations = donations.filter((d) => d.donorEmail === user?.email);
+  const myDonations = useMemo(() => donations.filter((d) => d.donorEmail === user?.email), [donations, user?.email]);
   // Active = Status is 'active'
-  const activeDonations = myDonations.filter((d) => d.status === 'active');
+  const activeDonations = useMemo(() => myDonations.filter((d) => d.status === 'active'), [myDonations]);
   // History = Volunteer picked it up (claimed) or delivered
-  const historyDonations = myDonations.filter(
+  const historyDonations = useMemo(() => myDonations.filter(
     (d) => d.status === 'claimed' || d.status === 'delivered'
-  );
+  ), [myDonations]);
 
   return (
     <Layout>

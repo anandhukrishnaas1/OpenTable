@@ -84,7 +84,11 @@ const Toast: React.FC<ToastProps> = ({ message, type, isVisible, onClose, durati
 
   return (
     <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[9999] animate-slide-down w-[90vw] max-w-md">
-      <div className={`${c.bg} border rounded-2xl shadow-xl overflow-hidden`}>
+      <div 
+        className={`${c.bg} border rounded-2xl shadow-xl overflow-hidden`}
+        role="alert" 
+        aria-live="assertive"
+      >
         <div
           className={`${c.bar} h-1 animate-shrink-bar`}
           style={{ animationDuration: `${duration}ms` }}
@@ -95,6 +99,7 @@ const Toast: React.FC<ToastProps> = ({ message, type, isVisible, onClose, durati
           <button
             onClick={onClose}
             className="text-gray-400 hover:text-gray-600 transition shrink-0"
+            aria-label="Close notification"
           >
             <X size={18} />
           </button>
