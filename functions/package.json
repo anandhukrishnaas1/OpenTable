@@ -1,0 +1,13 @@
+{
+  "name": "functions",
+  "scripts": {
+    "build": "tsc"
+  },
+  "dependencies": {
+    "firebase-admin": "^11.8.0",
+    "firebase-functions": "^4.3.1"
+  },
+  "devDependencies": {
+    "typescript": "^4.9.0"
+  }
+}
