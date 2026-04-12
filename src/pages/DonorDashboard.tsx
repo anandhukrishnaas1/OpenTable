@@ -53,6 +53,19 @@ const DonorDashboard: React.FC = () => {
     }
   }, [showToast]);
 
+  const performAnalysis = useCallback(async (imageBase64: string) => {
+    setAnalyzing(true);
+    try {
+      const result = await analyzeFoodImage(imageBase64);
+      setScanResult(result);
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Unknown error';
+      showToast('Analysis failed: ' + message, 'error');
+    } finally {
+      setAnalyzing(false);
+    }
+  }, [showToast]);
+
   const capturePhoto = useCallback(() => {
     if (videoRef.current && canvasRef.current) {
       const video = videoRef.current;
@@ -81,19 +94,6 @@ const DonorDashboard: React.FC = () => {
       reader.readAsDataURL(file);
     }
   }, [performAnalysis]);
-
-  const performAnalysis = useCallback(async (imageBase64: string) => {
-    setAnalyzing(true);
-    try {
-      const result = await analyzeFoodImage(imageBase64);
-      setScanResult(result);
-    } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : 'Unknown error';
-      showToast('Analysis failed: ' + message, 'error');
-    } finally {
-      setAnalyzing(false);
-    }
-  }, [showToast]);
 
   const handleUseCurrentLocation = useCallback(() => {
     setIsLocating(true);

@@ -39,7 +39,7 @@ describe('geminiService - analyzeFoodImage', () => {
   });
 
   it('should handle API errors gracefully', async () => {
-    (global.fetch as unknown as ReturnType<typeof vi.fn>nown as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+    (global.fetch as unknown as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
       ok: false,
       status: 401,
       text: async () => 'Unauthorized'
